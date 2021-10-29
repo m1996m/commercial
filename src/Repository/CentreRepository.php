@@ -11,7 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Centre|null findOneBy(array $criteria, array $orderBy = null)
  * @method Centre[]    findAll()
  * @method Centre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
+ * @method Centre|null RechercherCentre(string $centre)
+  */
 class CentreRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -47,4 +48,20 @@ class CentreRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+    public function RechercherCentre($centre)
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.nom = :nom')
+            ->orWhere('c.tel = :tel')
+            ->orWhere('c.email = :email')
+            ->orWhere('c.pays = :pays')
+            ->orWhere('c.ville = :ville')
+            ->setParameters(['nom'=>$centre,'tel'=>$centre,'email'=>$centre,'pays'=>$centre,'ville'=>$centre])
+            ->orderBy('c.nom','ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
