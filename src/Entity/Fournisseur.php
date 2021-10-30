@@ -6,6 +6,7 @@ use App\Repository\FournisseurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=FournisseurRepository::class)
@@ -40,11 +41,6 @@ class Fournisseur
     private $tel;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Centre::class, inversedBy="fournisseurs")
-     */
-    private $centre;
-
-    /**
      * @ORM\OneToMany(targetEntity=FournisseurCentre::class, mappedBy="fournisseur")
      */
     private $fournisseurCentres;
@@ -53,6 +49,12 @@ class Fournisseur
      * @ORM\OneToMany(targetEntity=ProduitStock::class, mappedBy="fournisseur")
      */
     private $produitStocks;
+
+    /**
+     * @Gedmo\Slug(fields={"tel","nom"})
+     * @ORM\Column(type="string", length=255)
+     */
+    private $slug;
 
     public function __construct()
     {
@@ -113,18 +115,6 @@ class Fournisseur
         return $this;
     }
 
-    public function getCentre(): ?Centre
-    {
-        return $this->centre;
-    }
-
-    public function setCentre(?Centre $centre): self
-    {
-        $this->centre = $centre;
-
-        return $this;
-    }
-
     /**
      * @return Collection|FournisseurCentre[]
      */
@@ -181,6 +171,18 @@ class Fournisseur
                 $produitStock->setFournisseur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

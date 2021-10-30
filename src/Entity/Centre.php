@@ -6,6 +6,7 @@ use App\Repository\CentreRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=CentreRepository::class)
@@ -55,11 +56,6 @@ class Centre
     private $users;
 
     /**
-     * @ORM\OneToMany(targetEntity=Fournisseur::class, mappedBy="centre")
-     */
-    private $fournisseurs;
-
-    /**
      * @ORM\OneToMany(targetEntity=ClientCentre::class, mappedBy="centre")
      */
     private $clientCentres;
@@ -69,12 +65,24 @@ class Centre
      */
     private $fournisseurCentres;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="centre")
+     */
+    private $stocks;
+
+    /**
+     * @Gedmo\Slug(fields={"tel","nom"})
+     * @ORM\Column(type="string", length=255)
+     */
+    private $slug;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->fournisseurs = new ArrayCollection();
         $this->clientCentres = new ArrayCollection();
         $this->fournisseurCentres = new ArrayCollection();
+        $this->stocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -185,36 +193,6 @@ class Centre
     }
 
     /**
-     * @return Collection|Fournisseur[]
-     */
-    public function getFournisseurs(): Collection
-    {
-        return $this->fournisseurs;
-    }
-
-    public function addFournisseur(Fournisseur $fournisseur): self
-    {
-        if (!$this->fournisseurs->contains($fournisseur)) {
-            $this->fournisseurs[] = $fournisseur;
-            $fournisseur->setCentre($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFournisseur(Fournisseur $fournisseur): self
-    {
-        if ($this->fournisseurs->removeElement($fournisseur)) {
-            // set the owning side to null (unless already changed)
-            if ($fournisseur->getCentre() === $this) {
-                $fournisseur->setCentre(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|ClientCentre[]
      */
     public function getClientCentres(): Collection
@@ -270,6 +248,48 @@ class Centre
                 $fournisseurCentre->setCentre(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Stock[]
+     */
+    public function getStocks(): Collection
+    {
+        return $this->stocks;
+    }
+
+    public function addStock(Stock $stock): self
+    {
+        if (!$this->stocks->contains($stock)) {
+            $this->stocks[] = $stock;
+            $stock->setCentre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStock(Stock $stock): self
+    {
+        if ($this->stocks->removeElement($stock)) {
+            // set the owning side to null (unless already changed)
+            if ($stock->getCentre() === $this) {
+                $stock->setCentre(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

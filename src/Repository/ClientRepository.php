@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Client|null findOneBy(array $criteria, array $orderBy = null)
  * @method Client[]    findAll()
  * @method Client[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Client|null rechercherClient($value)
  */
 class ClientRepository extends ServiceEntityRepository
 {
@@ -47,4 +48,16 @@ class ClientRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    //Rechercher client
+    public function rechercherClient($value)
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.tel = :tel')
+            ->setParameter('tel', $value)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

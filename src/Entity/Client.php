@@ -6,6 +6,7 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
@@ -43,6 +44,12 @@ class Client
      * @ORM\OneToMany(targetEntity=ClientCentre::class, mappedBy="client")
      */
     private $clientCentres;
+
+    /**
+     * @Gedmo\Slug(fields={"tel","nom"})
+     * @ORM\Column(type="string", length=255)
+     */
+    private $slug;
 
     public function __construct()
     {
@@ -128,6 +135,18 @@ class Client
                 $clientCentre->setClient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }
