@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Stock|null findOneBy(array $criteria, array $orderBy = null)
  * @method Stock[]    findAll()
  * @method Stock[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Stock|null rechercherStock($value)
  */
 class StockRepository extends ServiceEntityRepository
 {
@@ -47,4 +48,15 @@ class StockRepository extends ServiceEntityRepository
         ;
     }
     */
+    //Recherche stock
+    public function rechercherStock($value)
+    {
+        return $this->createQueryBuilder('s')
+            ->Where('s.nom = :nom')
+            ->setParameter('nom', $value)
+            ->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

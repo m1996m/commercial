@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProduitStock index{% endblock %}
+
+{% block body %}
+    <h1>ProduitStock index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>PUA</th>
+                <th>PUV</th>
+                <th>CreatedAt</th>
+                <th>Quantite</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for produit_stock in produit_stocks %}
+            <tr>
+                <td>{{ produit_stock.id }}</td>
+                <td>{{ produit_stock.PUA }}</td>
+                <td>{{ produit_stock.PUV }}</td>
+                <td>{{ produit_stock.createdAt ? produit_stock.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ produit_stock.quantite }}</td>
+                <td>
+                    <a href="{{ path('produit_stock_show', {'id': produit_stock.id}) }}">show</a>
+                    <a href="{{ path('produit_stock_edit', {'id': produit_stock.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('produit_stock_new') }}">Create new</a>
+{% endblock %}

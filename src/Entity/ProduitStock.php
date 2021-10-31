@@ -33,11 +33,6 @@ class ProduitStock
     private $user;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
-     */
-    private $createdAt;
-
-    /**
      * @ORM\Column(type="integer")
      */
     private $quantite;
@@ -56,6 +51,11 @@ class ProduitStock
      * @ORM\ManyToOne(targetEntity=Stock::class, inversedBy="produitStocks")
      */
     private $stock;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createAt;
 
     public function getId(): ?int
     {
@@ -94,18 +94,6 @@ class ProduitStock
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -154,6 +142,18 @@ class ProduitStock
     public function setStock(?Stock $stock): self
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getCreateAt(): ?\DateTimeInterface
+    {
+        return $this->createAt;
+    }
+
+    public function setCreateAt(\DateTimeInterface $createAt): self
+    {
+        $this->createAt = $createAt;
 
         return $this;
     }

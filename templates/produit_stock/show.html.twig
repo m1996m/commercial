@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProduitStock{% endblock %}
+
+{% block body %}
+    <h1>ProduitStock</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ produit_stock.id }}</td>
+            </tr>
+            <tr>
+                <th>PUA</th>
+                <td>{{ produit_stock.PUA }}</td>
+            </tr>
+            <tr>
+                <th>PUV</th>
+                <td>{{ produit_stock.PUV }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ produit_stock.createdAt ? produit_stock.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Quantite</th>
+                <td>{{ produit_stock.quantite }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('produit_stock_index') }}">back to list</a>
+
+    <a href="{{ path('produit_stock_edit', {'id': produit_stock.id}) }}">edit</a>
+
+    {{ include('produit_stock/_delete_form.html.twig') }}
+{% endblock %}

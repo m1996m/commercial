@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Produit;
+use App\Entity\TypeProduit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,6 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Produit|null findOneBy(array $criteria, array $orderBy = null)
  * @method Produit[]    findAll()
  * @method Produit[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Produit|null rechercherProduit($value)
+ * @method Produit|null rechercherProduitTypeDesignation($value,$type)
  */
 class ProduitRepository extends ServiceEntityRepository
 {
@@ -47,4 +50,26 @@ class ProduitRepository extends ServiceEntityRepository
         ;
     }
     */
+    //rechercher produit en fonction de la designation
+    public function rechercherProduit($value)
+    {
+        $qb= $this->createQueryBuilder('p')
+            ->Where('p.designation = :val')
+            ->setParameter('val', $value)
+            ->orderBy('p.designation', 'ASC');
+            $query = $qb->getQuery();
+            return $query->execute();
+    }
+
+    //rechercher produit en fonction de la designation et du type
+    public function rechercherProduitTypeDesignation($value,TypeProduit $type): ?Produit
+    {
+        return $this->createQueryBuilder('p')
+            ->Where('p.designation = :val')
+            ->andWhere('p.type = :type')
+            ->setParameters(['val'=> $value,'type'=>$type])
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
