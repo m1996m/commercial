@@ -28,11 +28,6 @@ class Produitvendu
      */
     private $rayon;
 
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     */
-    private $createdAt;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -58,18 +53,6 @@ class Produitvendu
     public function setRayon(?Rayon $rayon): self
     {
         $this->rayon = $rayon;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }

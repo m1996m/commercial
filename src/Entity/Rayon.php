@@ -25,11 +25,6 @@ class Rayon
     private $quantite;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
-     */
-    private $createdAt;
-
-    /**
      * @ORM\OneToMany(targetEntity=Vente::class, mappedBy="rayon")
      */
     private $ventes;
@@ -38,6 +33,26 @@ class Rayon
      * @ORM\OneToMany(targetEntity=Produitvendu::class, mappedBy="rayon")
      */
     private $produitvendus;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ProduitStock::class, inversedBy="rayons")
+     */
+    private $produitStock;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="rayons")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=TypeRayon::class, inversedBy="rayons")
+     */
+    private $type;
 
     public function __construct()
     {
@@ -60,18 +75,6 @@ class Rayon
 
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    } 
 
     /**
      * @return Collection|Produitvendu[]
@@ -99,6 +102,54 @@ class Rayon
                 $produitvendu->setRayon(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getProduitStock(): ?ProduitStock
+    {
+        return $this->produitStock;
+    }
+
+    public function setProduitStock(?ProduitStock $produitStock): self
+    {
+        $this->produitStock = $produitStock;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getType(): ?TypeRayon
+    {
+        return $this->type;
+    }
+
+    public function setType(?TypeRayon $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

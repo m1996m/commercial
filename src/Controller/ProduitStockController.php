@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Fournisseur;
+use App\Entity\FournisseurCentre;
 use App\Entity\Produit;
 use App\Entity\ProduitStock;
 use App\Entity\Stock;
@@ -55,6 +56,12 @@ class ProduitStockController extends AbstractController
         $produitStock->setUser($user);
         $produitStock->setFournisseur($fournisseur);
         $entityManager->persist($produitStock);
+        $entityManager->flush();
+        //Ajout du fournisseur centre
+        $clientCentre=new FournisseurCentre();
+        $clientCentre->setFournisseur($fournisseur);
+        $clientCentre->setCentre($produitStock->getStock()->getCentre());
+        $entityManager->persist($clientCentre);
         $entityManager->flush();
         return $this->json('Ajout reussi',200);
     }
@@ -133,6 +140,11 @@ class ProduitStockController extends AbstractController
         $produitStock->setStock($stock);
         $produitStock->setUser($user);
         $produitStock->setFournisseur($fournisseur);
+        $this->getDoctrine()->getManager()->flush();
+        //Ajout du fournisseur centre
+        $clientCentre=new FournisseurCentre();
+        $clientCentre->setFournisseur($fournisseur);
+        $clientCentre->setCentre($produitStock->getStock()->getCentre());
         $this->getDoctrine()->getManager()->flush();
         return $this->json($produitStock,200, [], $defaultContext);
     }

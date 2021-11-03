@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProduitStockRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -56,6 +58,16 @@ class ProduitStock
      * @ORM\Column(type="datetime")
      */
     private $createAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Rayon::class, mappedBy="produitStock")
+     */
+    private $rayons;
+
+    public function __construct()
+    {
+        $this->rayons = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +166,36 @@ class ProduitStock
     public function setCreateAt(\DateTimeInterface $createAt): self
     {
         $this->createAt = $createAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Rayon[]
+     */
+    public function getRayons(): Collection
+    {
+        return $this->rayons;
+    }
+
+    public function addRayon(Rayon $rayon): self
+    {
+        if (!$this->rayons->contains($rayon)) {
+            $this->rayons[] = $rayon;
+            $rayon->setProduitStock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRayon(Rayon $rayon): self
+    {
+        if ($this->rayons->removeElement($rayon)) {
+            // set the owning side to null (unless already changed)
+            if ($rayon->getProduitStock() === $this) {
+                $rayon->setProduitStock(null);
+            }
+        }
 
         return $this;
     }

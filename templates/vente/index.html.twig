@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vente index{% endblock %}
+
+{% block body %}
+    <h1>Vente index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Quantite</th>
+                <th>CreatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vente in ventes %}
+            <tr>
+                <td>{{ vente.id }}</td>
+                <td>{{ vente.quantite }}</td>
+                <td>{{ vente.createdAt ? vente.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('vente_show', {'id': vente.id}) }}">show</a>
+                    <a href="{{ path('vente_edit', {'id': vente.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('vente_new') }}">Create new</a>
+{% endblock %}

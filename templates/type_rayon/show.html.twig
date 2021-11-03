@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeRayon{% endblock %}
+
+{% block body %}
+    <h1>TypeRayon</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ type_rayon.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ type_rayon.designation }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('type_rayon_index') }}">back to list</a>
+
+    <a href="{{ path('type_rayon_edit', {'id': type_rayon.id}) }}">edit</a>
+
+    {{ include('type_rayon/_delete_form.html.twig') }}
+{% endblock %}

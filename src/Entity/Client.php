@@ -51,9 +51,15 @@ class Client
      */
     private $slug;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Vente::class, mappedBy="client")
+     */
+    private $ventes;
+
     public function __construct()
     {
         $this->clientCentres = new ArrayCollection();
+        $this->ventes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +153,36 @@ class Client
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Vente[]
+     */
+    public function getVentes(): Collection
+    {
+        return $this->ventes;
+    }
+
+    public function addVente(Vente $vente): self
+    {
+        if (!$this->ventes->contains($vente)) {
+            $this->ventes[] = $vente;
+            $vente->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVente(Vente $vente): self
+    {
+        if ($this->ventes->removeElement($vente)) {
+            // set the owning side to null (unless already changed)
+            if ($vente->getClient() === $this) {
+                $vente->setClient(null);
+            }
+        }
 
         return $this;
     }

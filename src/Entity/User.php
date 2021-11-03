@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -71,6 +73,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $slug;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Rayon::class, mappedBy="user")
+     */
+    private $rayons;
+
+    public function __construct()
+    {
+        $this->rayons = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -241,6 +253,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Rayon[]
+     */
+    public function getRayons(): Collection
+    {
+        return $this->rayons;
+    }
+
+    public function addRayon(Rayon $rayon): self
+    {
+        if (!$this->rayons->contains($rayon)) {
+            $this->rayons[] = $rayon;
+            $rayon->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRayon(Rayon $rayon): self
+    {
+        if ($this->rayons->removeElement($rayon)) {
+            // set the owning side to null (unless already changed)
+            if ($rayon->getUser() === $this) {
+                $rayon->setUser(null);
+            }
+        }
 
         return $this;
     }

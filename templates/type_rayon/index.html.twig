@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeRayon index{% endblock %}
+
+{% block body %}
+    <h1>TypeRayon index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Designation</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for type_rayon in type_rayons %}
+            <tr>
+                <td>{{ type_rayon.id }}</td>
+                <td>{{ type_rayon.designation }}</td>
+                <td>
+                    <a href="{{ path('type_rayon_show', {'id': type_rayon.id}) }}">show</a>
+                    <a href="{{ path('type_rayon_edit', {'id': type_rayon.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('type_rayon_new') }}">Create new</a>
+{% endblock %}

@@ -20,11 +20,6 @@ class Vente
     private $id;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
-     */
-    private $createdAt;
-
-    /**
      * @ORM\OneToMany(targetEntity=Produitvendu::class, mappedBy="vente")
      */
     private $produitvendus;
@@ -33,6 +28,16 @@ class Vente
      * @ORM\Column(type="integer")
      */
     private $quantite;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="ventes")
+     */
+    private $client;
 
     public function __construct()
     {
@@ -43,18 +48,6 @@ class Vente
     {
         return $this->id;
     }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    } 
 
     /**
      * @return Collection|Produitvendu[]
@@ -94,6 +87,30 @@ class Vente
     public function setQuantite(int $quantite): self
     {
         $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }

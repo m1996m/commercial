@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Rayon{% endblock %}
+
+{% block body %}
+    <h1>Create new Rayon</h1>
+
+    {{ include('rayon/_form.html.twig') }}
+
+    <a href="{{ path('rayon_index') }}">back to list</a>
+{% endblock %}
