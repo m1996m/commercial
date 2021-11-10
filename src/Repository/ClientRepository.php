@@ -60,4 +60,16 @@ class ClientRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getTel($tel)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->Where('e.tel=:tel')
+            ->setParameter('tel', $tel)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

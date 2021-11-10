@@ -87,4 +87,24 @@ class CentreController extends AbstractController
         $entityManager->flush();
         return $this->json('Suppression bien reussie',200);
     }
+
+    /**
+     * @Route("/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET"})
+     */
+    public function verificationUniciteTel(CentreRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getTel($content['tel']),200);
+    }
+
+    /**
+     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET"})
+     */
+    public function verificationUniciteEmail(CentreRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getemail($content['email']),200);
+    }
 }

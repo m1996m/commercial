@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Entity\User;
 use App\Form\ClientType;
+use App\Repository\ClientCentreRepository;
 use App\Repository\ClientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,9 @@ class ClientController extends AbstractController
     /**
      * @Route("/client", name="client_index", methods={"GET"})
      */
-    public function index(ClientRepository $clientRepository): Response
+    public function index(ClientCentreRepository $clientRepository): Response
     {
-        return $this->json($clientRepository->findAll(),200);
+        return $this->json($clientRepository->getAll($this->getUser()->getCentre()),200);
     }
 
     /**
@@ -83,5 +84,15 @@ class ClientController extends AbstractController
         $entityManager->remove($client);
         $entityManager->flush();
         return $this->json('Suppression reussie', 200);
+    }
+
+    /**
+     * @Route("/verificationUniciteTelClient", name="verificationUniciteClient", methods={"GET"})
+     */
+    public function verificationUniciteClient(ClientRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getTel($content['tel']),200);
     }
 }

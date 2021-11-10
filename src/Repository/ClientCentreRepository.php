@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\ClientCentre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -11,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ClientCentre|null findOneBy(array $criteria, array $orderBy = null)
  * @method ClientCentre[]    findAll()
  * @method ClientCentre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ClientCentre[]    getAll($centre)
  */
 class ClientCentreRepository extends ServiceEntityRepository
 {
@@ -47,4 +49,15 @@ class ClientCentreRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getAll(Centre $centre)
+    {
+        return $this->createQueryBuilder('c')
+            ->join("c.centre","centre")
+            ->select('centre.nom,centre.prenom,centre.adresse,centre.tel')
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

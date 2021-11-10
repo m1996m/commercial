@@ -82,4 +82,13 @@ class FournisseurController extends AbstractController
         $content=json_decode($request,true);
         return $this->json($repos->rechercherFournisseur($content['content']),200);
     }
+    /**
+     * @Route("/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET"})
+     */
+    public function verificationUniciteTelFournisseur(FournisseurRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getTel($content['tel']),200);
+    }
 }

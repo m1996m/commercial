@@ -64,4 +64,26 @@ class CentreRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+    public function getTel($tel)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->Where('e.tel=:tel')
+            ->setParameter('tel', $tel)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    public function getemail($email)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->Where('e.email=:email')
+            ->setParameter('email', $email)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

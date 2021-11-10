@@ -66,4 +66,13 @@ class TypeProduitController extends AbstractController
         $entityManager->flush();
         return $this->json('Suppression reussie', 200);
     }
+    /**
+     * @Route("/verificationUniciteTypeProduit", name="verificationUniciteTypeProduit", methods={"GET"})
+     */
+    public function verificationUniciteTypeProduit(TypeProduitRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->findOneBy(['type'=>$content['type']]),200);
+    }
 }
