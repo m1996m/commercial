@@ -79,6 +79,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $rayons;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $first;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $actif;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $image;
+
     public function __construct()
     {
         $this->rayons = new ArrayCollection();
@@ -283,6 +298,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $rayon->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFirst(): ?int
+    {
+        return $this->first;
+    }
+
+    public function setFirst(int $first): self
+    {
+        $this->first = $first;
+
+        return $this;
+    }
+
+    public function getActif(): ?string
+    {
+        return $this->actif;
+    }
+
+    public function setActif(string $actif): self
+    {
+        $this->actif = $actif;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

@@ -52,6 +52,7 @@ class TypeRayonRepository extends ServiceEntityRepository
     public function verificationTypeRayon($value)
     {
         return $this->createQueryBuilder('t')
+            ->select("t.id")
             ->andWhere('t.designation = :val')
             ->setParameter('val', $value)
             ->getQuery()

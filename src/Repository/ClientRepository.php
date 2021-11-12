@@ -62,6 +62,7 @@ class ClientRepository extends ServiceEntityRepository
         ;
     }
 
+<<<<<<< HEAD
     //Rechercher client
     public function getAll()
     {
@@ -71,6 +72,17 @@ class ClientRepository extends ServiceEntityRepository
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getResult()
+=======
+    public function getTel($tel)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->Where('e.tel=:tel')
+            ->setParameter('tel', $tel)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+>>>>>>> employe
         ;
     }
 }

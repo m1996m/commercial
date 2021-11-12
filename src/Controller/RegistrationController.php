@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,13 +28,23 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      */
-    public function register(Request $request,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
+    public function register(Request $request,UserRepository $repos,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         $user = new User();
         $request=$request->getContent();
         $form=json_decode($request,true);
         $user->setEmail($form['email']);
+        $user->setActif('non');
+        $user->setNom($form['nom']);
+        $user->setPrenom($form['prenom']);
+        $user->setTel($form['tel']);
+        $user->setFirst(1);
         $user->setPassword($enccoder->encodePassword($user,$form['password']));
+        if($repos->findAll()){
+            $user->setRoles(['ROLE_USER']);
+        }else{
+            $user->setRoles(['ROLE_ADMIN']);
+        }
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();

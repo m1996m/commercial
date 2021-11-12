@@ -14,6 +14,9 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User|null lastId()
+ * @method User|null getAll()
+ * @method User|null rechercherEmploye($value)
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
@@ -64,4 +67,50 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
     */
+
+    //Last id
+    public function lastId()
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id')
+            ->orderBy('s.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function getAll()
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id,e.nom,e.prenom,e.tel')
+            ->orderBy('e.id', 'DESC')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    //Rechercher un user
+    public function rechercherEmploye($tel)
+    {
+        return $this->createQueryBuilder('e')
+            ->Where('e.tel=:tel')
+            ->setParameter('tel', $tel)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    //Rechercher un tel
+    public function getTel($tel)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->Where('e.tel=:tel')
+            ->setParameter('tel', $tel)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

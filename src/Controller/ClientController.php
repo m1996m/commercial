@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\ClientCentre;
 use App\Entity\User;
 use App\Form\ClientType;
+use App\Repository\ClientCentreRepository;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,14 +22,18 @@ class ClientController extends AbstractController
     /**
      * @Route("/client", name="client_index", methods={"GET"})
      */
-    public function index(ClientRepository $clientRepository): Response
+    public function index(ClientCentreRepository $clientRepository): Response
     {
+<<<<<<< HEAD
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
         return $this->json($clientRepository->getAll(),200,[],$defaultContext);
+=======
+        return $this->json($clientRepository->getAll($this->getUser()->getCentre()),200);
+>>>>>>> employe
     }
 
     /**
@@ -112,5 +117,15 @@ class ClientController extends AbstractController
         $entityManager->remove($client);
         $entityManager->flush();
         return $this->json('Suppression reussie', 200);
+    }
+
+    /**
+     * @Route("/verificationUniciteTelClient", name="verificationUniciteClient", methods={"GET"})
+     */
+    public function verificationUniciteClient(ClientRepository $repos,Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getTel($content['tel']),200);
     }
 }
