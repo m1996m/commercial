@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -54,6 +55,19 @@ class StockRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->Where('s.nom = :nom')
             ->setParameter('nom', $value)
+            ->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getAll(Centre $centre)
+    {
+        return $this->createQueryBuilder('s')
+        ->join('s.centre','centre')
+            ->Where('s.centre = :centre')
+            ->select("s.nom,s.adresse,s.id,centre.id,centre.nom")
+            ->setParameter('centre', $centre)
             ->orderBy('s.nom', 'ASC')
             ->getQuery()
             ->getResult()

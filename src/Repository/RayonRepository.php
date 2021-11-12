@@ -103,4 +103,20 @@ class RayonRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getAll(Centre $centre)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.type','type')
+            ->join('r.produitStock','ps')
+            ->join('ps.stock','stock')
+            ->join('stock.centre','centre')
+            ->select("type.designation,centre.nom,r.quantite,r.id,centre.id")
+            ->andWhere('centre = :val')
+            ->setParameter('val', $centre)
+            ->orderBy('r.quantite', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 }

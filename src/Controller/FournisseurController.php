@@ -3,13 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Fournisseur;
+use App\Entity\FournisseurCentre;
 use App\Form\FournisseurType;
+use App\Repository\CentreRepository;
+use App\Repository\FournisseurCentreRepository;
 use App\Repository\FournisseurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class FournisseurController extends AbstractController
 {
@@ -18,13 +21,18 @@ class FournisseurController extends AbstractController
      */
     public function index(FournisseurRepository $fournisseurRepository): Response
     {
-        return $this->json($fournisseurRepository->findAll(),200);
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        return $this->json($fournisseurRepository->findAll(),200,[],$defaultContext);
     }
 
     /**
      * @Route("/fournisseur/new", name="fournisseur_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request,FournisseurRepository $repos,CentreRepository $reposCentre): Response
     {
         $fournisseur = new Fournisseur();
         $request=$request->getContent();
@@ -36,6 +44,12 @@ class FournisseurController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($fournisseur);
         $entityManager->flush();
+        $fournisseurCentre = new FournisseurCentre();
+        $fournisseur=$repos->findOneBy(['tel'=>$form['tel']]);
+        $fournisseurCentre->setCentre($this->getUser()->getCentre());
+        $fournisseurCentre->setFournisseur($fournisseur);
+        $entityManager->persist($fournisseur);
+        $entityManager->flush();
         return $this->json('Ajout reussi', 200);
     }
 
@@ -44,14 +58,24 @@ class FournisseurController extends AbstractController
      */
     public function show(Fournisseur $fournisseur): Response
     {
-        return $this->json($fournisseur,200);
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        return $this->json($fournisseur,200,[],$defaultContext);
     }
 
     /**
      * @Route("/getAndEditFournisseur/{id}", name="fournisseur_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Fournisseur $fournisseur): Response
+    public function edit(Request $request, Fournisseur $fournisseur,FournisseurCentreRepository $fc,FournisseurRepository $repos,CentreRepository $reposCentre): Response
     {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
         $request=$request->getContent();
         $form=json_decode($request,true);
         $fournisseur->setNom($form['nom']);
@@ -59,7 +83,7 @@ class FournisseurController extends AbstractController
         $fournisseur->setTel($form['tel']);
         $fournisseur->setAdresse($form['adresse']);
         $this->getDoctrine()->getManager()->flush();
-        return $this->json('Modification reussie', 200);
+        return $this->json('Modification reussie', 200,[],$defaultContext);
     }
 
     /**
@@ -78,8 +102,13 @@ class FournisseurController extends AbstractController
      */
     public function rechercherFournisseur(Request $request, FournisseurRepository $repos): Response
     {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherFournisseur($content['content']),200);
+        return $this->json($repos->rechercherFournisseur($content['content']),200,[],$defaultContext);
     }
 }

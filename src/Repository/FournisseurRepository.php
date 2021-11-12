@@ -59,4 +59,14 @@ class FournisseurRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+    public function getAll()
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.centre = :centre')
+            ->select('nom,tel,id, prenom, adresse')
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

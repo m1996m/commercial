@@ -27,7 +27,7 @@ class RayonController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($rayonRepository->findAll(),200,[],$defaultContext);
+        return $this->json($rayonRepository->getAll($this->getUser()->getCentre()),200,[],$defaultContext);
     }
 
     /**

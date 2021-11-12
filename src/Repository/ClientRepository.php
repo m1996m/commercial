@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\Client;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -55,6 +56,18 @@ class ClientRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
             ->Where('c.tel = :tel')
             ->setParameter('tel', $value)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    //Rechercher client
+    public function getAll()
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.centre = :centre')
+            ->select('nom,tel,id, prenom, adresse')
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getResult()

@@ -48,11 +48,6 @@ class VenteController extends AbstractController
         $produitVendu->setVente($vente);
         $produitVendu->setRayon($rayon);
         $this->getDoctrine()->getManager()->flush();
-        //Mise à jour client centre
-        $clientCentre=new ClientCentre();
-        $clientCentre->setClient($client);
-        $clientCentre->setCentre($rayons->getProduitStock()->getStock()->getCentre());
-        $this->getDoctrine()->getManager()->flush();
         return $this->json('Modification reussie',200, [],$defaultContext);
     }
 

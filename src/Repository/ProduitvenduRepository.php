@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\Client;
 use App\Entity\Produitvendu;
 use App\Entity\Rayon;
@@ -83,7 +84,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getAll()
+    public function getAll(Centre $centre)
     {
         return $this->createQueryBuilder('p')
             ->join('p.vente','vente')
@@ -93,7 +94,10 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('rayon.produitStock','ps')
             ->join('ps.produit','produit')
             ->join('produit.type','tp')
+            ->join('ps.stock','stock')
+            ->where('stock.centre=:centre')
             ->select("client.nom,client.prenom,produit.designation,tp.type,vente.quantite,ps.PUV,p.id,vente.id")
+            ->setParameter('centre',$centre)
             ->orderBy('p.id', 'ASC')
             ->getQuery()
             ->getResult()

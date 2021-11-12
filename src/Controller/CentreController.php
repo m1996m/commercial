@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class CentreController extends AbstractController
 {
@@ -17,9 +18,14 @@ class CentreController extends AbstractController
      */
     public function index(CentreRepository $centreRepository): Response
     {
-        $centres=$centreRepository->findAll();
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        $centres=$centreRepository->getAll();
 
-        return $this->json($centres,200);
+        return $this->json($centres,200,[],$defaultContext);
     }
 
     /**
@@ -47,7 +53,12 @@ class CentreController extends AbstractController
      */
     public function show(Centre $centre): Response
     {
-        return $this->json($centre,200);
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        return $this->json($centre,200,[],$defaultContext);
     }
     
 
@@ -56,15 +67,25 @@ class CentreController extends AbstractController
      */
     public function rechercherCentre(CentreRepository $repos, Request $request): Response
     {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
         $request=$request->getContent();
         $valeur=json_decode($request,true);
-        return $this->json($repos->rechercherCentre($valeur['content']),200);
+        return $this->json($repos->rechercherCentre($valeur['content']),200,[],$defaultContext);
     }
     /**
      * @Route("/modificationCentre/{id}", name="centre_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Centre $centre): Response
     {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
         $request=$request->getContent();
         $form=json_decode($request,true);
         $centre->setNom($form['nom']);
@@ -74,7 +95,7 @@ class CentreController extends AbstractController
         $centre->setPays($form['pays']);
         $centre->setEmail($form['email']);
         $this->getDoctrine()->getManager()->flush();
-        return $this->json($centre,200);
+        return $this->json($centre,200,[],$defaultContext);
     }
 
     /**

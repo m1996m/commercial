@@ -27,7 +27,7 @@ class StockController extends AbstractController
             }
         ];
             
-        return $this->json($stockRepository->findAll(),200,[],$defaultContent);
+        return $this->json($stockRepository->getAll($this->getUser()->getCentre()),200,[],$defaultContent);
     }
 
     /**

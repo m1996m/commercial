@@ -64,4 +64,14 @@ class CentreRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getAll()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('nom,prenom,tel,email,id,adresse,pays,ville')
+            ->orderBy('c.nom','ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

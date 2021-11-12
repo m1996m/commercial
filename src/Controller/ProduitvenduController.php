@@ -28,7 +28,7 @@ class ProduitvenduController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($venteRepository->getAll(),200,[],$defaultContext);
+        return $this->json($venteRepository->getAll($this->getuser()->getCentre()),200,[],$defaultContext);
     }
 
     /**
@@ -58,12 +58,6 @@ class ProduitvenduController extends AbstractController
         $produitVendu->setVente($ventes);
         $produitVendu->setRayon($rayon);
         $entityManager->persist($produitVendu);
-        $entityManager->flush();
-        //Ajout du client centre
-        $clientCentre=new ClientCentre();
-        $clientCentre->setClient($client);
-        $clientCentre->setCentre($rayons->getProduitStock()->getStock()->getCentre());
-        $entityManager->persist($clientCentre);
         $entityManager->flush();
         return $this->json('Ajout reussi', 200);
     }
