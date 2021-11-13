@@ -59,7 +59,6 @@ class FournisseurRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-<<<<<<< HEAD
     public function getAll()
     {
         return $this->createQueryBuilder('c')
@@ -67,8 +66,8 @@ class FournisseurRepository extends ServiceEntityRepository
             ->select('nom,tel,id, prenom, adresse')
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
-            ->getResult()
-=======
+            ->getResult();
+    }
     public function getTel($tel)
     {
         return $this->createQueryBuilder('e')
@@ -77,8 +76,6 @@ class FournisseurRepository extends ServiceEntityRepository
             ->setParameter('tel', $tel)
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult()
->>>>>>> employe
-        ;
+            ->getOneOrNullResult();
     }
 }

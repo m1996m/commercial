@@ -24,16 +24,12 @@ class ClientController extends AbstractController
      */
     public function index(ClientCentreRepository $clientRepository): Response
     {
-<<<<<<< HEAD
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($clientRepository->getAll(),200,[],$defaultContext);
-=======
         return $this->json($clientRepository->getAll($this->getUser()->getCentre()),200);
->>>>>>> employe
     }
 
     /**

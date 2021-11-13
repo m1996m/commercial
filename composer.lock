@@ -4,11 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "1a11f8c135b2510485ed824964b7d9ae",
-=======
-    "content-hash": "7dca9896a88134b0eec8a3e864c75b00",
->>>>>>> employe
     "packages": [
         {
             "name": "api-platform/core",
@@ -2357,8 +2352,6 @@
             "time": "2021-10-01T21:08:31+00:00"
         },
         {
-<<<<<<< HEAD
-=======
             "name": "namshi/jose",
             "version": "7.2.3",
             "source": {
@@ -2422,7 +2415,6 @@
             "time": "2016-12-05T07:27:31+00:00"
         },
         {
->>>>>>> employe
             "name": "nelmio/cors-bundle",
             "version": "2.1.1",
             "source": {
@@ -2958,12 +2950,8 @@
             "keywords": [
                 "annotations",
                 "controllers"
-            ],
-<<<<<<< HEAD
-            "time": "2021-09-06T13:24:35+00:00"
-=======
-            "time": "2021-10-20T09:43:03+00:00"
->>>>>>> employe
+            ]
+
         },
         {
             "name": "stof/doctrine-extensions-bundle",

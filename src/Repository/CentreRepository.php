@@ -64,16 +64,15 @@ class CentreRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-<<<<<<< HEAD
 
     public function getAll()
     {
         return $this->createQueryBuilder('c')
-            ->select('nom,prenom,tel,email,id,adresse,pays,ville')
+            ->select('c.nom,c.tel,c.email,c.id,c.adresse,c.pays,c.ville')
             ->orderBy('c.nom','ASC')
             ->getQuery()
-            ->getResult()
-=======
+            ->getResult();
+    }
     public function getTel($tel)
     {
         return $this->createQueryBuilder('e')
@@ -93,8 +92,6 @@ class CentreRepository extends ServiceEntityRepository
             ->setParameter('email', $email)
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult()
->>>>>>> employe
-        ;
+            ->getOneOrNullResult();
     }
 }
