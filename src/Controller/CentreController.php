@@ -49,7 +49,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/getCentre/{id}", name="centre_show", methods={"GET"})
+     * @Route("/getOneCentre/{id}", name="centre_show", methods={"GET"})
      */
     public function show(Centre $centre): Response
     {
@@ -63,7 +63,7 @@ class CentreController extends AbstractController
     
 
     /**
-     * @Route("/rechercherCentre", name="rechercherCentre", methods={"GET"})
+     * @Route("/rechercherCentre", name="rechercherCentre", methods={"GET","POST"})
      */
     public function rechercherCentre(CentreRepository $repos, Request $request): Response
     {
@@ -77,7 +77,7 @@ class CentreController extends AbstractController
         return $this->json($repos->rechercherCentre($valeur['content']),200,[],$defaultContext);
     }
     /**
-     * @Route("/modificationCentre/{id}", name="centre_edit", methods={"GET","POST"})
+     * @Route("/getAndOrEditCentre/{id}", name="centre_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Centre $centre): Response
     {
@@ -99,7 +99,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/centre/{id}", name="centre_delete", methods={"POST"})
+     * @Route("/getDeleteCentre/{id}", name="centre_delete", methods={"POST"})
      */
     public function delete(Request $request, Centre $centre): Response
     {
@@ -110,7 +110,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET"})
+     * @Route("/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET","POST"})
      */
     public function verificationUniciteTel(CentreRepository $repos,Request $request): Response
     {
@@ -120,7 +120,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET"})
+     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
      */
     public function verificationUniciteEmail(CentreRepository $repos,Request $request): Response
     {
