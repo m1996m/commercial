@@ -61,10 +61,22 @@ class StockRepository extends ServiceEntityRepository
         ;
     }
 
+    //Recherche stock
+    public function verificationNom($value,Centre $centre)
+    {
+        return $this->createQueryBuilder('s')
+            ->Where('s.nom = :nom')
+            ->where('s.centre=:centre')
+            ->setParameters(['nom'=>$value,'centre'=>$centre])
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function getAll(Centre $centre)
     {
         return $this->createQueryBuilder('s')
-        ->join('s.centre','centre')
+            ->join('s.centre','centre')
             ->Where('s.centre = :centre')
             ->select("s.nom,s.adresse,s.id,centre.id,centre.nom")
             ->setParameter('centre', $centre)

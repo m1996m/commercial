@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Centre;
 use App\Entity\Produit;
 use App\Form\ProduitType;
+use App\Repository\CentreRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\TypeProduitRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,14 +20,15 @@ class ProduitController extends AbstractController
     /**
      * @Route("/produit", name="produit_index", methods={"GET"})
      */
-    public function index(ProduitRepository $produitRepository): Response
+    public function index(ProduitRepository $produitRepository,CentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
                 return "Symfony 5";
             },
         ];
-        return $this->json($produitRepository->findAll(),200,[],$defaultContext);
+        $centre=$repos->find(1);
+        return $this->json($produitRepository->getAll($centre),200,[],$defaultContext);
     }
 
     /**
@@ -50,21 +53,22 @@ class ProduitController extends AbstractController
     /**
      * @Route("/getOneProduit/{id}", name="produit_show", methods={"GET"})
      */
-    public function show(Produit $produit): Response
+    public function show($id,ProduitRepository $repos,CentreRepository $centrer): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
                 return "Symfony 5";
             },
         ];
-        return $this->json( $produit,200,[],$defaultContext);
+        $centre=$centrer->find(1);
+        return $this->json($repos->getOneProduit($id,$centre),200,[],$defaultContext);
     }
 
     /**
      * Cette fonction permet de recuperer un objet on fonction du produit choisi lors de l'ajout dans produit article
-     * @Route("/rechercherProduitDesignationType", name="rechercherProduitDesignationType", methods={"GET"})
+     * @Route("/rechercherProduitDesignationType", name="rechercherProduitDesignationType", methods={"GET","POST"})
      */
-    public function rechercherProduitPrix(ProduitRepository $repos, Request $request, TypeProduitRepository $repo): Response
+    public function rechercherProduitPrix(ProduitRepository $repos, Request $request, CentreRepository $repo): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
@@ -73,13 +77,31 @@ class ProduitController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        return $this->json( $repos->find($content['designation']),200,[],$defaultContext);
+        $centre=$repo->find(1);
+        return $this->json( $repos->rechercherProduit($content['content'],$centre,1),200,[],$defaultContext);
+    }
+
+        /**
+     * Cette fonction permet de recuperer un objet on fonction du produit choisi lors de l'ajout dans produit article
+     * @Route("/rechercherProduitID", name="rechercherProduitID", methods={"GET","POST"})
+     */
+    public function rechercherProduitID(ProduitRepository $repos, Request $request, CentreRepository $repo): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
+                return "Symfony 5";
+            },
+        ];
+        $centre=$repo->find(1);
+        return $this->json( $repos->rechercherProduitID($centre,$content['produit']),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/rechercherProduit", name="rechercherProduit", methods={"GET"})
+     * @Route("/rechercherProduit", name="rechercherProduit", methods={"GET","POST"})
      */
-    public function rechercherProduit(ProduitRepository $repos, Request $request, TypeProduitRepository $repo): Response
+    public function rechercherProduit(ProduitRepository $repos, Request $request, CentreRepository $repo): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
@@ -89,7 +111,8 @@ class ProduitController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        return $this->json( $repos->rechercherProduit($content['content'],$type),200,[],$defaultContext);
+        $centre=$repos->find(1);
+        return $this->json( $repos->rechercherProduitTypeDesignation($content['content'],$type,$centre),200,[],$defaultContext);
     }
 
     /**

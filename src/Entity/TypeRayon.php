@@ -29,6 +29,11 @@ class TypeRayon
      */
     private $rayons;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Centre::class, inversedBy="typeRayons")
+     */
+    private $centre;
+
     public function __construct()
     {
         $this->rayons = new ArrayCollection();
@@ -77,6 +82,18 @@ class TypeRayon
                 $rayon->setType(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCentre(): ?Centre
+    {
+        return $this->centre;
+    }
+
+    public function setCentre(?Centre $centre): self
+    {
+        $this->centre = $centre;
 
         return $this;
     }

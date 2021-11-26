@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\ProduitStock;
 use App\Entity\TypeProduit;
 use App\Entity\Produit;
@@ -60,29 +61,71 @@ class ProduitStockRepository extends ServiceEntityRepository
     //Cette fonction permet de rechercher un produit dans la table produitStock en fonction du produit et le stock
     public function getProduit(Produit $produit,Stock $stock)
     {
-        return $this->createQueryBuilder('p')
+        return $this->createQueryBuilder('s')
             //->select('p.id')
-            ->Where('p.produit = :produit')
-            ->andWhere('p.stock = :stock')
-            ->andWhere('p.quantite > :quantite')
+            ->join('s.user','user')
+            ->join('s.fournisseur ','f')
+            ->join('s.produit ','produit')
+            ->join('s.stock ','stock')
+            ->join('produit.type','type')
+            ->select("f.id,f.nom,f.prenom,f.tel,f.adresse,type.type,type.id,produit.id,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom,user.id,user.nom,user.prenom")
+            ->Where('s.produit = :produit')
+            ->andWhere('s.stock = :stock')
+            ->andWhere('s.quantite > :quantite')
             ->setParameters(['produit'=> $produit,'stock'=>$stock,'quantite'=>0])
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    //Etat du stock
+    public function getEtatStockProduit(Stock $stock,Centre $centre)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.produit','produit')
+            ->join('produit.type','type')
+            ->join('type.centre','centre')
+            ->select("SUM(p.quantite) as total,produit.designation,type.type")
+            ->andWhere('p.stock = :stock')
+            ->andWhere('type.centre = :centre')
+            ->groupBy('produit.designation,produit.type')
+            ->setParameters(['stock'=>$stock,'centre'=>$centre])
             ->getQuery()
             ->getResult()
         ;
     }
 
-    //Etat du stock
-    public function getEtatStockProduit(Stock $stock)
+    public function getAll(Centre $centre)
     {
-        return $this->createQueryBuilder('p')
-            ->join('p.produit','produit')
+        return $this->createQueryBuilder('s')
+            ->join('s.stock','stock')
+            ->join('s.user','user')
+            ->join('s.produit','produit')
+            ->join('s.fournisseur','f')
             ->join('produit.type','type')
-            ->select("SUM(p.quantite) as total,produit.designation,type.type")
-            ->andWhere('p.stock = :stock')
-            ->groupBy('produit.designation,produit.type')
-            ->setParameter('stock',$stock)
+            ->Where('user.centre = :centre')
+            ->select("f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idp,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,stock.id as ids,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser,produit.id as idP")
+            ->setParameter('centre', $centre)
+            ->orderBy('s.id', 'DESC')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function getOneProduitStock($id)
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.stock','stock')
+            ->join('s.user','user')
+            ->join('s.produit','produit')
+            ->join('s.fournisseur','f')
+            ->join('produit.type','type')
+            ->Where('s.id = :id')
+            ->select("f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idp,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser")
+            ->setParameter('id', $id)
+            ->orderBy('s.id', 'DESC')
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
     }
 }

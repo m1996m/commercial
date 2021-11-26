@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Centre;
 use App\Entity\Fournisseur;
 use App\Entity\FournisseurCentre;
 use App\Entity\Produit;
@@ -11,6 +12,7 @@ use App\Entity\TypeProduit;
 use App\Entity\User;
 use App\Form\ProduitStockType;
 use App\Form\ProduitType;
+use App\Repository\CentreRepository;
 use App\Repository\ProduitStockRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,14 +26,15 @@ class ProduitStockController extends AbstractController
     /**
      * @Route("/produit/stock", name="produit_stock_index", methods={"GET"})
      */
-    public function index(ProduitStockRepository $produitStockRepository): Response
+    public function index(ProduitStockRepository $produitStockRepository,CentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
                 return "Symfony 5";
             },
         ];
-        return $this->json($produitStockRepository->findAll(),200,[],$defaultContext);
+        $centre=$repos->find(1);
+        return $this->json($produitStockRepository->getAll($centre),200,[],$defaultContext);
     }
 
     /**
@@ -44,7 +47,7 @@ class ProduitStockController extends AbstractController
         $form=json_decode($request,true);
         $entityManager = $this->getDoctrine()->getManager();
         $produit=$entityManager->getRepository(Produit::class)->find($form['produit']);
-        $user=$entityManager->getRepository(User::class)->find($form['user']);
+        $user=$entityManager->getRepository(User::class)->find(1);
         $fournisseur=$entityManager->getRepository(Fournisseur::class)->find($form['fournisseur']);
         $stock=$entityManager->getRepository(Stock::class)->find($form['stock']);
         $produitStock->setPUV($form['puv']);
@@ -67,21 +70,21 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getOneProduitStock/{id}", name="produit_stock_show", methods={"GET"})
+     * @Route("/getOneProduitStock/{id}", name="produit_stock_show", methods={"GET","POST"})
      */
-    public function show(ProduitStock $produitStock): Response
+    public function show(ProduitStockRepository $repos,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
                 return "Symfony 5";
             },
         ];
-        return $this->json($produitStock,200,[],$defaultContext);
+        return $this->json($repos->getOneProduitStock($id),200,[],$defaultContext);
     }
 
     /**
      * Permet de rechercher un produit un groupe de produit dans le stock produit
-     * @Route("/getProduit", name="getProduit", methods={"GET"})
+     * @Route("/getProduit", name="getProduit", methods={"GET","POST"})
      */
     public function getProduit(Request $request,ProduitStockRepository $repos): Response
     {
@@ -99,9 +102,9 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getEtatStockProduit", name="etatStock", methods={"GET"})
+     * @Route("/getEtatStockProduit", name="etatStock", methods={"GET","POST"})
      */
-    public function getEtatStockProduit(Request $request,ProduitStockRepository $repos): Response
+    public function getEtatStockProduit(Request $request,ProduitStockRepository $repos,CentreRepository $centrer): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
@@ -112,7 +115,8 @@ class ProduitStockController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        return $this->json($repos->getEtatStockProduit($stock),200,[],$defaultContext);
+        $centre=$centrer->find(1);
+        return $this->json($repos->getEtatStockProduit($stock,$centre),200,[],$defaultContext);
     }
 
     /**

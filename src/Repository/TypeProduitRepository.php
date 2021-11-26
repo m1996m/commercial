@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\TypeProduit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,4 +48,14 @@ class TypeProduitRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function getAll(Centre $centre)
+    {
+        return $this->createQueryBuilder('t')
+            ->select("t.type,t.id")
+            ->andWhere('t.centre = :centre')
+            ->setParameter('centre',$centre)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

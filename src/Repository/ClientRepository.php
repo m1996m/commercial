@@ -54,11 +54,12 @@ class ClientRepository extends ServiceEntityRepository
     public function rechercherClient($value)
     {
         return $this->createQueryBuilder('c')
+            ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
             ->Where('c.tel = :tel')
             ->setParameter('tel', $value)
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
     //Rechercher client
@@ -78,6 +79,17 @@ class ClientRepository extends ServiceEntityRepository
             ->Where('e.tel=:tel')
             ->setParameter('tel', $tel)
             ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function getOneClient($id)
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
+            ->Where('c.id = :id')
+            ->setParameter('id',$id)
+            ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
     }

@@ -7,6 +7,7 @@ use App\Entity\Stock;
 use App\Form\StockType;
 use App\Repository\CentreRepository;
 use App\Repository\StockRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,15 +20,15 @@ class StockController extends AbstractController
     /**
      * @Route("/stock", name="stock_index", methods={"GET"})
      */
-    public function index(StockRepository $stockRepository): Response
+    public function index(StockRepository $stockRepository,CentreRepository $repos): Response
     {
         $defaultContent=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet, $format,$context){
                 return "Symfony 5";
             }
         ];
-            
-        return $this->json($stockRepository->getAll($this->getUser()->getCentre()),200,[],$defaultContent);
+        $user=$repos->find(1); 
+        return $this->json($stockRepository->getAll($user),200,[],$defaultContent);
     }
 
     /**
@@ -93,7 +94,7 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/rechercherStock", name="rechercherStock", methods={"GET"})
+     * @Route("/rechercherStock", name="rechercherStock", methods={"GET","POST"})
      */
     public function rechercherStock(StockRepository $repos, Request $request): Response
     {
@@ -105,5 +106,21 @@ class StockController extends AbstractController
             }
         ];
         return $this->json($repos->rechercherStock($content['content']),200,[],$defaultContent);
+    }
+
+    /**
+     * @Route("/verificationNom", name="verificationNom", methods={"GET","POST"})
+     */
+    public function verificationNom(StockRepository $repos,CentreRepository $centreR, Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        $defaultContent=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet, $format,$context){
+                return "Symfony 5";
+            }
+        ];
+        $centre=$centreR->find($content['centre']);
+        return $this->json($repos->rechercherStock($content['nom'],$centre),200,[],$defaultContent);
     }
 }

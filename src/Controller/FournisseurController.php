@@ -19,14 +19,15 @@ class FournisseurController extends AbstractController
     /**
      * @Route("/fournisseur", name="fournisseur_index", methods={"GET"})
      */
-    public function index(FournisseurRepository $fournisseurRepository): Response
+    public function index(FournisseurCentreRepository $fournisseurRepository,CentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($fournisseurRepository->findAll(),200,[],$defaultContext);
+        $centre=$repos->find(1);
+        return $this->json($fournisseurRepository->getAll($centre),200,[],$defaultContext);
     }
 
     /**
@@ -45,25 +46,26 @@ class FournisseurController extends AbstractController
         $entityManager->persist($fournisseur);
         $entityManager->flush();
         $fournisseurCentre = new FournisseurCentre();
+        $centre=$reposCentre->find(1);
         $fournisseur=$repos->findOneBy(['tel'=>$form['tel']]);
-        $fournisseurCentre->setCentre($this->getUser()->getCentre());
+        $fournisseurCentre->setCentre($centre);
         $fournisseurCentre->setFournisseur($fournisseur);
-        $entityManager->persist($fournisseur);
+        $entityManager->persist($fournisseurCentre);
         $entityManager->flush();
         return $this->json('Ajout reussi', 200);
     }
 
     /**
-     * @Route("/getOnefournisseur/{id}", name="fournisseur_show", methods={"GET"})
+     * @Route("/getOnefournisseur/{id}", name="fournisseur_show", methods={"GET","POST"})
      */
-    public function show(Fournisseur $fournisseur): Response
+    public function show(FournisseurRepository $repos,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($fournisseur,200,[],$defaultContext);
+        return $this->json($repos->getOneFournisseur($id),200,[],$defaultContext);
     }
 
     /**
@@ -98,7 +100,7 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/rechercherfournisseur", name="rechercherFournisseur", methods={"GET"})
+     * @Route("/rechercherfournisseur", name="rechercherFournisseur", methods={"GET","POST"})
      */
     public function rechercherFournisseur(Request $request, FournisseurRepository $repos): Response
     {
@@ -112,7 +114,7 @@ class FournisseurController extends AbstractController
         return $this->json($repos->rechercherFournisseur($content['content']),200,[],$defaultContext);
     }
     /**
-     * @Route("/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET"})
+     * @Route("/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET","POST"})
      */
     public function verificationUniciteTelFournisseur(FournisseurRepository $repos,Request $request): Response
     {

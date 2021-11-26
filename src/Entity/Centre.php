@@ -76,6 +76,16 @@ class Centre
      */
     private $slug;
 
+    /**
+     * @ORM\OneToMany(targetEntity=TypeProduit::class, mappedBy="centre")
+     */
+    private $typeProduits;
+
+    /**
+     * @ORM\OneToMany(targetEntity=TypeRayon::class, mappedBy="centre")
+     */
+    private $typeRayons;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -83,6 +93,8 @@ class Centre
         $this->clientCentres = new ArrayCollection();
         $this->fournisseurCentres = new ArrayCollection();
         $this->stocks = new ArrayCollection();
+        $this->typeProduits = new ArrayCollection();
+        $this->typeRayons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -290,6 +302,66 @@ class Centre
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|TypeProduit[]
+     */
+    public function getTypeProduits(): Collection
+    {
+        return $this->typeProduits;
+    }
+
+    public function addTypeProduit(TypeProduit $typeProduit): self
+    {
+        if (!$this->typeProduits->contains($typeProduit)) {
+            $this->typeProduits[] = $typeProduit;
+            $typeProduit->setCentre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTypeProduit(TypeProduit $typeProduit): self
+    {
+        if ($this->typeProduits->removeElement($typeProduit)) {
+            // set the owning side to null (unless already changed)
+            if ($typeProduit->getCentre() === $this) {
+                $typeProduit->setCentre(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|TypeRayon[]
+     */
+    public function getTypeRayons(): Collection
+    {
+        return $this->typeRayons;
+    }
+
+    public function addTypeRayon(TypeRayon $typeRayon): self
+    {
+        if (!$this->typeRayons->contains($typeRayon)) {
+            $this->typeRayons[] = $typeRayon;
+            $typeRayon->setCentre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTypeRayon(TypeRayon $typeRayon): self
+    {
+        if ($this->typeRayons->removeElement($typeRayon)) {
+            // set the owning side to null (unless already changed)
+            if ($typeRayon->getCentre() === $this) {
+                $typeRayon->setCentre(null);
+            }
+        }
 
         return $this;
     }

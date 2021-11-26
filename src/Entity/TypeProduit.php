@@ -29,6 +29,11 @@ class TypeProduit
      */
     private $produits;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Centre::class, inversedBy="typeProduits")
+     */
+    private $centre;
+
 
     public function __construct()
     {
@@ -78,6 +83,18 @@ class TypeProduit
                 $produit->setType(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCentre(): ?Centre
+    {
+        return $this->centre;
+    }
+
+    public function setCentre(?Centre $centre): self
+    {
+        $this->centre = $centre;
 
         return $this;
     }

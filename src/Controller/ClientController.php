@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\ClientCentre;
 use App\Entity\User;
 use App\Form\ClientType;
+use App\Repository\CentreRepository;
 use App\Repository\ClientCentreRepository;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
@@ -22,14 +23,15 @@ class ClientController extends AbstractController
     /**
      * @Route("/client", name="client_index", methods={"GET"})
      */
-    public function index(ClientCentreRepository $clientRepository): Response
+    public function index(ClientCentreRepository $clientRepository,CentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($clientRepository->getAll($this->getUser()->getCentre()),200);
+        $centre=$repos->find(1);
+        return $this->json($clientRepository->getAll($centre),200);
     }
 
     /**
@@ -57,20 +59,20 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/getCLient/{id}", name="client_show", methods={"GET"})
+     * @Route("/getOneCLient/{id}", name="client_show", methods={"GET","POST"})
      */
-    public function show(Client $client): Response
+    public function show(ClientRepository $repos,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($client,200,[],$defaultContext);
+        return $this->json($repos->getOneClient($id),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/rechercherClient", name="rechercherCLient", methods={"GET"})
+     * @Route("/rechercherClient", name="rechercherClient", methods={"GET","POST"})
      */
     public function rechercherClient(Request $request, ClientRepository $repos): Response
     {

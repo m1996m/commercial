@@ -54,7 +54,8 @@ class ClientCentreRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->join("c.centre","centre")
-            ->select('centre.nom,centre.prenom,centre.adresse,centre.tel')
+            ->join("c.client","cl")
+            ->select('centre.nom,cl.prenom,cl.adresse,cl.tel,cl.id,cl.nom')
             ->orderBy('c.id', 'ASC')
             ->getQuery()
             ->getResult()

@@ -53,20 +53,22 @@ class FournisseurRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->Where('c.tel = :tel')
+            ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
             ->setParameter('tel', $value)
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
-    public function getAll()
+    public function getOneFournisseur($id)
     {
         return $this->createQueryBuilder('c')
-            ->Where('c.centre = :centre')
-            ->select('nom,tel,id, prenom, adresse')
+            ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
+            ->Where('c.id = :id')
+            ->setParameter('id',$id)
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
     public function getTel($tel)
     {

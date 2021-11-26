@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Centre;
 use App\Entity\FournisseurCentre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,5 +48,15 @@ class FournisseurCentreRepository extends ServiceEntityRepository
         ;
     }
     */
-
+    public function getAll(Centre $centre)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.fournisseur','f')
+            ->Where('c.centre = :centre')
+            ->select('c.id,f.id,f.nom,f.prenom,f.tel,f.adresse')
+            ->orderBy('f.nom', 'ASC')
+            ->setParameter('centre',$centre)
+            ->getQuery()
+            ->getResult();
+    }
 }

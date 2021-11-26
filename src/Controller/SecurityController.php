@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class SecurityController extends AbstractController
 {
     /**
-     * @Route("/api/login_check", name="app_login")
+     * @Route("/api/login", name="app_login")
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {

@@ -90,7 +90,7 @@ class EmployeController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteTel", name="verificationUniciteTel", methods={"GET"})
+     * @Route("/verificationUniciteTel", name="verificationUniciteTel", methods={"GET","POST"})
      */
     public function verificationUniciteTel(UserRepository $repos,Request $request): Response
     {
@@ -105,7 +105,22 @@ class EmployeController extends AbstractController
     }
 
     /**
-     * @Route("/ValiditeModePasse/{id}", name="ValiditeModePasse", methods={"GET"})
+     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
+     */
+    public function verificationUniciteEmail(UserRepository $repos,Request $request): Response
+    {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        return $this->json($repos->getEmail($content['email']),200,[],$defaultContext);
+    }
+
+    /**
+     * @Route("/ValiditeModePasse/{id}", name="ValiditeModePasse", methods={"GET","POST"})
      */
     public function edit(Request $request, User $user, UserPasswordEncoderInterface $encoder): Response
     {
