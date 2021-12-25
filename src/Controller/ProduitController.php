@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Centre;
 use App\Entity\Produit;
-use App\Form\ProduitType;
 use App\Repository\CentreRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\TypeProduitRepository;
@@ -39,7 +37,7 @@ class ProduitController extends AbstractController
         $produit = new Produit();
         $request=$request->getContent();
         $form=json_decode($request,true);
-        $type=$repos->find($form['type']);
+        $type=$repos->find($form['idTypeProduit']);
         $produit->setDesignation($form['designation']);
         $produit->settype($type);
         $produit->setPUA($form['pua']);
@@ -77,8 +75,7 @@ class ProduitController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        $centre=$repo->find(1);
-        return $this->json( $repos->rechercherProduit($content['content'],$centre,1),200,[],$defaultContext);
+        return $this->json($repos->rechercherProduit($content['content'],1,1),200,[],$defaultContext);
     }
 
         /**
@@ -94,8 +91,7 @@ class ProduitController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        $centre=$repo->find(1);
-        return $this->json( $repos->rechercherProduitID($centre,$content['produit']),200,[],$defaultContext);
+        return $this->json( $repos->rechercherProduitID(1,$content['idProduit']),200,[],$defaultContext);
     }
 
     /**
@@ -111,8 +107,22 @@ class ProduitController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        $centre=$repos->find(1);
-        return $this->json( $repos->rechercherProduitTypeDesignation($content['content'],$type,$centre),200,[],$defaultContext);
+        return $this->json($repos->rechercherProduitTypeDesignation($content['designation'],$content['idTypeProduit'],1),200,[],$defaultContext);
+    }
+
+    /**
+     * @Route("/getProduitSearchIntantanes", name="getProduitSearchIntantanes", methods={"GET","POST"})
+     */
+    public function getProduitsearchIntantane(ProduitRepository $repos, Request $request): Response
+    {
+        $request=$request->getContent();
+        $content=json_decode($request,true);
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
+                return "Symfony 5";
+            },
+        ];
+        return $this->json($repos->rechercherProduitInstatane($content['idProduit'],1),200,[],$defaultContext);
     }
 
     /**
@@ -127,13 +137,13 @@ class ProduitController extends AbstractController
         ];
         $request=$request->getContent();
         $form=json_decode($request,true);
-        $type=$repos->find($form['type']);
+        $type=$repos->find($form['idTypeProduit']);
         $produit->setDesignation($form['designation']);
-        $produit->settype($type);
-        $produit->setPUA($form['pua']);
-        $produit->setPUV($form['puv']);
+        $produit->setType($type);
+        $produit->setPUA($form['PUA']);
+        $produit->setPUV($form['PUV']);
         $this->getDoctrine()->getManager()->flush();
-        return $this->json($produit,200, [], $defaultContext);
+        return $this->json("Modification reussie",200, [], $defaultContext);
     }
 
     /**

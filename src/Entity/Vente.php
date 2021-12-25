@@ -25,11 +25,6 @@ class Vente
     private $produitvendus;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $quantite;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
@@ -38,6 +33,16 @@ class Vente
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="ventes")
      */
     private $client;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="ventes")
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $remise;
 
     public function __construct()
     {
@@ -79,18 +84,6 @@ class Vente
         return $this;
     }
 
-    public function getQuantite(): ?int
-    {
-        return $this->quantite;
-    }
-
-    public function setQuantite(int $quantite): self
-    {
-        $this->quantite = $quantite;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -111,6 +104,30 @@ class Vente
     public function setClient(?Client $client): self
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getRemise(): ?int
+    {
+        return $this->remise;
+    }
+
+    public function setRemise(int $remise): self
+    {
+        $this->remise = $remise;
 
         return $this;
     }

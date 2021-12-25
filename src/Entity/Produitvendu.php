@@ -28,6 +28,11 @@ class Produitvendu
      */
     private $rayon;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $quantite;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -53,6 +58,18 @@ class Produitvendu
     public function setRayon(?Rayon $rayon): self
     {
         $this->rayon = $rayon;
+
+        return $this;
+    }
+
+    public function getQuantite(): ?int
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(int $quantite): self
+    {
+        $this->quantite = $quantite;
 
         return $this;
     }

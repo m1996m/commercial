@@ -30,14 +30,13 @@ class ClientController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        $centre=$repos->find(1);
-        return $this->json($clientRepository->getAll($centre),200);
+        return $this->json($clientRepository->getAll(1),200);
     }
 
     /**
      * @Route("/client/new", name="client_new", methods={"GET","POST"})
      */
-    public function new(Request $request,UserPasswordEncoderInterface $encoder,ClientRepository $repos): Response
+    public function new(CentreRepository $centreRepository,Request $request,UserPasswordEncoderInterface $encoder,ClientRepository $repos): Response
     {
         $client = new Client();
         $request=$request->getContent();
@@ -51,8 +50,10 @@ class ClientController extends AbstractController
         $entityManager->flush();
         $ClientCentre = new ClientCentre();
         $client=$repos->findOneBy(['tel'=>$form['tel']]);
-        $ClientCentre->setCentre($this->getUser()->getCentre());
+        //$ClientCentre->setCentre($this->getUser()->getCentre());
         $ClientCentre->setClient($client);
+        $ClientCentre->setCentre($centreRepository->find(1));
+        $entityManager->persist($centreRepository->find(1));
         $entityManager->persist($ClientCentre);
         $entityManager->flush();
         return $this->json('Ajout reussi', 200);
@@ -61,20 +62,20 @@ class ClientController extends AbstractController
     /**
      * @Route("/getOneCLient/{id}", name="client_show", methods={"GET","POST"})
      */
-    public function show(ClientRepository $repos,$id): Response
+    public function show(ClientCentreRepository $repos,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->getOneClient($id),200,[],$defaultContext);
+        return $this->json($repos->getOneClient(1,$id),200,[],$defaultContext);
     }
 
     /**
      * @Route("/rechercherClient", name="rechercherClient", methods={"GET","POST"})
      */
-    public function rechercherClient(Request $request, ClientRepository $repos): Response
+    public function rechercherClient(Request $request, ClientCentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
@@ -83,11 +84,11 @@ class ClientController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherClient($content['content']),200,[],$defaultContext);
+        return $this->json($repos->rechercherClient($content['idClient'],1),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/getAndEditClient/{id}", name="client_edit", methods={"GET","POST"})
+     * @Route("/getAndEditClient/{slug}", name="client_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Client $client): Response
     {
@@ -118,12 +119,12 @@ class ClientController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteTelClient", name="verificationUniciteClient", methods={"GET"})
+     * @Route("/verificationUniciteTelClient", name="verificationUniciteClient", methods={"GET","POST"})
      */
-    public function verificationUniciteClient(ClientRepository $repos,Request $request): Response
+    public function verificationUniciteClient(ClientCentreRepository $repos,Request $request): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->getTel($content['tel']),200);
+        return $this->json($repos->getTel($content['tel'],1),200);
     }
 }

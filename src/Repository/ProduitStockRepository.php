@@ -72,7 +72,42 @@ class ProduitStockRepository extends ServiceEntityRepository
             ->Where('s.produit = :produit')
             ->andWhere('s.stock = :stock')
             ->andWhere('s.quantite > :quantite')
-            ->setParameters(['produit'=> $produit,'stock'=>$stock,'quantite'=>0])
+            ->setParameters(['produit'=> $produit,'stock'=>$stock,'quantite'=>'s.prise'])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+        //Cette fonction permet de rechercher instantenement un produit.
+        public function getProduitsearchIntantane($produit,$idCentre)
+        {
+            return $this->createQueryBuilder('s')
+                ->join('s.user','user')
+                ->join('s.fournisseur ','f')
+                ->join('s.produit ','produit')
+                ->join('s.stock ','stock')
+                ->join('stock.centre','centre')
+                ->join('produit.type','type')
+                ->select("f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idp,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,stock.id as ids,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser,produit.id as idP")
+                ->Where('produit.designation LIKE :produit')
+                ->andWhere('centre.id = :centre')
+                ->andWhere('s.quantite > :quantite')
+                ->setParameters(['produit'=>'%'.$produit.'%','centre'=>$idCentre,'quantite'=>'s.prise'])
+                ->setMaxResults(5)
+                ->getQuery()
+                ->getResult()
+            ;
+        }
+
+    public function totalQuantite($idProduit)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produit','p')
+            ->join('p.type','t')
+            ->select("SUM(r.quantite) as totalQuantite,SUM(r.prise) as totalprise")
+            ->andWhere('p.id = :idProduit')
+            ->andWhere('r.quantite > :quantite')
+            ->setParameters(['idProduit'=>$idProduit,'quantite'=>'r.prise'])
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -90,22 +125,25 @@ class ProduitStockRepository extends ServiceEntityRepository
             ->andWhere('type.centre = :centre')
             ->groupBy('produit.designation,produit.type')
             ->setParameters(['stock'=>$stock,'centre'=>$centre])
+            ->orderBy('total', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function getAll(Centre $centre)
+    public function getAll($idcentre)
     {
         return $this->createQueryBuilder('s')
             ->join('s.stock','stock')
             ->join('s.user','user')
+            ->join('stock.centre','centre')
             ->join('s.produit','produit')
             ->join('s.fournisseur','f')
             ->join('produit.type','type')
-            ->Where('user.centre = :centre')
             ->select("f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idp,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,stock.id as ids,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser,produit.id as idP")
-            ->setParameter('centre', $centre)
+            ->Where('centre.id = :centre')
+            ->andWhere('s.quantite > =:quantite')
+            ->setParameters(['centre'=>$idcentre,"quantite"=>(int)'s.quantite'-(int)'s.prise'])
             ->orderBy('s.id', 'DESC')
             ->getQuery()
             ->getResult()
@@ -121,11 +159,69 @@ class ProduitStockRepository extends ServiceEntityRepository
             ->join('s.fournisseur','f')
             ->join('produit.type','type')
             ->Where('s.id = :id')
-            ->select("f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idp,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser")
+            ->select("stock.id as ids,f.id as idf,f.nom as nomf,f.prenom as prenomf,f.tel as telf,f.adresse as adressef,type.type,type.id as idt,produit.id as idP,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom as noms,user.id as idUser,user.nom as nomUser,user.prenom as prenomUser")
             ->setParameter('id', $id)
             ->orderBy('s.id', 'DESC')
             ->getQuery()
             ->getOneOrNullResult()
+        ;
+    }
+
+    public function verificationQuantite($idStock,$quantite)
+    {
+        return $this->createQueryBuilder('s')
+            ->select("s.quantite,s.prise")
+            ->Where('s.id = :id')
+            ->andWhere('s.quantite <:quantite')
+            ->setParameters(['id'=> $idStock,'quantite'=>$quantite+(int)'s.prise'])
+            ->orderBy('s.id', 'DESC')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function stock($idProduitStock)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produit','p')
+            ->join('r.stock','s')
+            ->join('p.type','type')
+            ->select(" p.designation as produit,s.nom as stock,type.type")
+            ->andWhere('r.id = :id')
+            ->setParameter('id',$idProduitStock)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+//Permet de retourner l'identifiant du stock
+    public function getIDProduitStock($idProduit)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produit','p')
+            ->select(" p.id")
+            ->andWhere('p.id = :id')
+            ->andWhere('r.quantite > :q')
+            ->setParameters(['id'=>$idProduit,'q'=>'r.prise'])
+            ->orderBy('r.id','DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function totaldata($idProduitStock)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.fournisseur','f')
+            ->join('r.stock','s')
+            ->join('r.produit','p')
+            ->join('p.type','t')
+            ->select("p.id as idP,f.id as idf,s.id as idStock,r.id as idProduitStock,r.quantite as quantiteProduitStock,r.prise as priseProduitStock")
+            ->andWhere('p.id = :idProduitStock')
+            ->andWhere('r.quantite > :quantite')
+            ->setParameters(['idProduitStock'=>$idProduitStock,'quantite'=>'r.prise'])
+            ->getQuery()
+            ->getResult()
         ;
     }
 }

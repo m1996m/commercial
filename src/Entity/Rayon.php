@@ -54,6 +54,11 @@ class Rayon
      */
     private $type;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $prise;
+
     public function __construct()
     {
         $this->produitvendus = new ArrayCollection();
@@ -150,6 +155,18 @@ class Rayon
     public function setType(?TypeRayon $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getPrise(): ?int
+    {
+        return $this->prise;
+    }
+
+    public function setPrise(int $prise): self
+    {
+        $this->prise = $prise;
 
         return $this;
     }

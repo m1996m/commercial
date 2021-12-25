@@ -50,39 +50,58 @@ class StockRepository extends ServiceEntityRepository
     }
     */
     //Recherche stock
-    public function rechercherStock($value)
+    public function rechercherStock($nomSock)
     {
         return $this->createQueryBuilder('s')
+            ->join('s.centre','centre')
+            ->select("s.nom,s.adresse,s.id,centre.id as idCentre,centre.nom as nomCentre")
             ->Where('s.nom = :nom')
-            ->setParameter('nom', $value)
+            ->setParameter('nom',$nomSock)
             ->orderBy('s.nom', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-
-    //Recherche stock
-    public function verificationNom($value,Centre $centre)
-    {
-        return $this->createQueryBuilder('s')
-            ->Where('s.nom = :nom')
-            ->where('s.centre=:centre')
-            ->setParameters(['nom'=>$value,'centre'=>$centre])
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
 
-    public function getAll(Centre $centre)
+    //Recherche stock
+    public function verificationNom($nomSotck,$idCentre)
     {
         return $this->createQueryBuilder('s')
             ->join('s.centre','centre')
-            ->Where('s.centre = :centre')
-            ->select("s.nom,s.adresse,s.id,centre.id,centre.nom")
-            ->setParameter('centre', $centre)
+            ->select("s.id")
+            ->Where('s.nom = :nom')
+            ->where('s.centre=:centre')
+            ->setParameters(['nom'=>$nomSotck,'centre'=>$idCentre])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function getAll($idCentre)
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.centre','centre')
+            ->select("s.nom,s.adresse,s.id,centre.id as idCentre,centre.nom as nomCentre")
+            ->Where('centre.id = :centre')
+            ->setParameter('centre', $idCentre)
             ->orderBy('s.nom', 'ASC')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function getOneStoke($idStock,$idCentre)
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.centre','centre')
+            ->select("s.nom,s.adresse,centre.tel as telCentre,centre.adresse as adresseCentre, s.id,centre.id as idCentre,centre.nom as nomCentre")
+            ->Where('s.id = :stock')
+            ->andWhere('centre.id= :centre')
+            ->setParameters(['stock'=>$idStock,'centre'=>$idCentre])
+            ->orderBy('s.nom', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
     }
 }

@@ -53,67 +53,180 @@ class RayonRepository extends ServiceEntityRepository
         ;
     }
     */
-    public function rechercherProduit(ProduitStock $produitStock)
+    //Permet de rechercher sur quel emplacement se trouve un produit
+    public function rechercherProduit($designation,$idCentre)
     {
         return $this->createQueryBuilder('r')
             ->join('r.type','type')
             ->join('r.produitStock','ps')
             ->join('ps.user','user')
             ->join('ps.stock','stock')
+            ->join('ps.produit','p')
+            ->join('p.type','t')
             ->join('stock.centre','centre')
-            ->select("type.designation,centre.nom,r.quantite,user.nom,user.prenom")
-            ->andWhere('r.produitStock = :val')
-            ->setParameter('val', $produitStock)
+            ->select("type.designation as designationType,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
+            ->andWhere('p.designation LIKE :idS')
+            ->andWhere('centre.id = :id')
+            ->setParameters(['idS'=>'%'.$designation.'%','id'=>$idCentre])
+            ->orderBy('r.type', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    //Permet de rechercher les produits que contiennent un rayon ou emplacement
+    public function rechercherProduitRayon($idType,$idCentre)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.type','type')
+            ->join('r.produitStock','ps')
+            ->join('ps.stock','stock')
+            ->join('ps.produit','p')
+            ->join('stock.centre','centre')
+            ->select("type.designation as designationType,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
+            ->Where('centre.id = :idc')
+            ->andWhere('type.id = :val')
+            ->setParameters(['idc'=>$idCentre,'val'=>$idType])
             ->orderBy('r.type', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function rechercherProduitRayon(TypeRayon $typeRayon,Centre $centre)
+    public function etatRayon($id)
     {
         return $this->createQueryBuilder('r')
             ->join('r.type','type')
             ->join('r.produitStock','ps')
             ->join('ps.stock','stock')
+            ->join('ps.produit','p')
+            ->join('p.type','tp')
             ->join('stock.centre','centre')
-            ->select("type.designation,centre.nom,r.quantite")
-            ->Where('centre = :centre')
-            ->andWhere('r.type = :val')
-            ->setParameters(['centre'=>$centre,'val'=>$typeRayon])
-            ->orderBy('r.type', 'ASC')
+            ->select("SUM(r.quantite) as total,p.designation as designationProduit,tp.type as typeProduit,type.designation as designationType")
+            ->andWhere('centre.id = :val')
+            ->groupBy('p.designation,tp.type,type.designation')
+            ->setParameter('val', $id)
+            ->orderBy('total,p.designation,tp.type','ASC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function etatRayon(Centre $centre)
+    public function getAll($idCentre)
     {
         return $this->createQueryBuilder('r')
             ->join('r.type','type')
             ->join('r.produitStock','ps')
             ->join('ps.stock','stock')
+            ->join('ps.produit','p')
+            ->join('p.type','t')
             ->join('stock.centre','centre')
-            ->select("type.designation,centre.nom,r.quantite")
-            ->andWhere('centre = :val')
-            ->setParameter('val', $centre)
+            ->select("type.designation as designationType,r.quantite,r.prise,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
+            ->Where('centre.id = :val')
+            ->andWhere('r.quantite >= :quantite')
+            ->setParameters(['val'=> $idCentre,'quantite'=>(int)'s.quantite'-(int)'s.prise'])
             ->orderBy('r.quantite', 'ASC')
+            ->setMaxResults(7)
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function getAll(Centre $centre)
+    public function getOneRayon($idCentre,$id)
     {
         return $this->createQueryBuilder('r')
             ->join('r.type','type')
             ->join('r.produitStock','ps')
             ->join('ps.stock','stock')
+            ->join('ps.produit','p')
             ->join('stock.centre','centre')
-            ->select("type.designation,centre.nom,r.quantite,r.id,centre.id")
-            ->andWhere('centre = :val')
-            ->setParameter('val', $centre)
+            ->select("type.designation as designationType,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
+            ->andWhere('centre.id = :val')
+            ->andWhere('r.id = :id')
+            ->setParameters(['val'=> $idCentre,'id'=>$id])
             ->orderBy('r.quantite', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    
+
+    public function vente($id)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produitStock','ps')
+            ->join('ps.produit','p')
+            ->join('p.type','type')
+            ->select(" p.designation as produit,ps.PUV as puv,type.type")
+            ->andWhere('r.id = :id')
+            ->setParameter('id',$id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function totalQuantite($idProduit)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produitStock','ps')
+            ->join('ps.produit','p')
+            ->join('p.type','t')
+            ->select("SUM(r.quantite) as totalQuantite,SUM(r.prise) as totalprise")
+            ->andWhere('p.id = :idProduit')
+            ->andWhere('r.quantite > :quantite')
+            ->setParameters(['idProduit'=>$idProduit,'quantite'=>'r.prise'])
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function totaldata($idProduit)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.produitStock','ps')
+            ->join('ps.fournisseur','f')
+            ->join('ps.stock','s')
+            ->join('r.type','tr')
+            ->join('ps.produit','p')
+            ->join('p.type','t')
+            ->select("r.id as idRayon,t.type as typeProduit,tr.id as idType,p.id as idP,f.id as idf,s.id as idStock,r.quantite as quantiteRayon,r.prise")
+            ->andWhere('p.id = :idProduit')
+            ->andWhere('r.quantite > :quantite')
+            ->andWhere('r.prise > :prise')
+            ->setParameters(['idProduit'=>$idProduit,'quantite'=>'r.prise','prise'=>0])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function verificationQuantite($idRayon,$quantite)
+    {
+        return $this->createQueryBuilder('s')
+            ->select("s.quantite,s.prise")
+            ->Where('s.id = :id')
+            ->andWhere('s.quantite <:quantite')
+            ->setParameters(['id'=> $idRayon,'quantite'=>(int)'s.prise'+$quantite])
+            ->orderBy('s.id', 'DESC')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function getIntataneShearch($idCentre,$produit)
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.type','type')
+            ->join('r.produitStock','ps')
+            ->join('ps.stock','stock')
+            ->join('ps.produit','p')
+            ->join('p.type','t')
+            ->join('stock.centre','centre')
+            ->select("type.designation as designationType,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
+            ->Where('centre.id = :val')
+            ->andWhere('r.quantite >= :quantite')
+            ->andWhere('p.designation >= :designation')
+            ->setParameters(['val'=> $idCentre,'quantite'=>(int)'s.quantite'-(int)'s.prise','designation'=>$produit])
+            ->orderBy('r.quantite', 'ASC')
+            ->setMaxResults(7)
             ->getQuery()
             ->getResult()
         ;

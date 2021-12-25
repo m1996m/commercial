@@ -56,20 +56,20 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/getOnefournisseur/{id}", name="fournisseur_show", methods={"GET","POST"})
+     * @Route("/getOnefournisseur/{slug}", name="fournisseur_show", methods={"GET","POST"})
      */
-    public function show(FournisseurRepository $repos,$id): Response
+    public function show(FournisseurCentreRepository $repos,$slug): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->getOneFournisseur($id),200,[],$defaultContext);
+        return $this->json($repos->getOneFournisseur(1,$slug),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/getAndEditFournisseur/{id}", name="fournisseur_edit", methods={"GET","POST"})
+     * @Route("/getAndEditFournisseur/{slug}", name="fournisseur_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Fournisseur $fournisseur,FournisseurCentreRepository $fc,FournisseurRepository $repos,CentreRepository $reposCentre): Response
     {
@@ -89,7 +89,7 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/getDeleteFournisseur/{id}", name="fournisseur_delete", methods={"POST"})
+     * @Route("/getDeleteFournisseur/{slug}", name="fournisseur_delete", methods={"POST"})
      */
     public function delete(Request $request, Fournisseur $fournisseur): Response
     {
@@ -111,15 +111,15 @@ class FournisseurController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherFournisseur($content['content']),200,[],$defaultContext);
+        return $this->json($repos->rechercherFournisseur($content['content'],1),200,[],$defaultContext);
     }
     /**
      * @Route("/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET","POST"})
      */
-    public function verificationUniciteTelFournisseur(FournisseurRepository $repos,Request $request): Response
+    public function verificationUniciteTelFournisseur(FournisseurCentreRepository $repos,Request $request): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->getTel($content['tel']),200);
+        return $this->json($repos->getTel($content['tel'],1),200);
     }
 }

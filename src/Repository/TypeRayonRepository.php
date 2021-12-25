@@ -49,12 +49,40 @@ class TypeRayonRepository extends ServiceEntityRepository
     }
     */
 
-    public function verificationTypeRayon($value)
+    public function verificationTypeRayon($designation,$idCentre)
     {
         return $this->createQueryBuilder('t')
+            ->join('t.centre','c')
+            ->select("t.id")
             ->select("t.id")
             ->andWhere('t.designation = :val')
-            ->setParameter('val', $value)
+            ->andWhere('c.id = :id')
+            ->setParameters(['val'=> $designation,'id'=>$idCentre])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    public function getAllTypeRayon($idCentre)
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.centre','c')
+            ->select("t.id,t.designation,c.nom as nomCentre, c.id as idCentre, c.adresse as adreeseCentre,c.tel as telCentre")
+            ->andWhere('c.id = :id')
+            ->setParameter('id', $idCentre)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getOneTypeRayon($idCentre,$id)
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.centre','c')
+            ->select("t.id,t.designation,c.nom as nomCentre, c.id as idCentre, c.adresse as adreeseCentre,c.tel as telCentre")
+            ->andWhere('c.id = :idCentre')
+            ->andWhere('t.id = :id')
+            ->setParameters(['idCentre'=> $idCentre,'id'=>$id])
             ->getQuery()
             ->getOneOrNullResult()
         ;

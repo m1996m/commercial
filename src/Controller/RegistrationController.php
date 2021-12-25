@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\Repository\CentreRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -28,17 +26,20 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="app_register", methods={"GET","POST"})
      */
-    public function register(Request $request,UserRepository $repos,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
+    public function register(CentreRepository $reposo,Request $request,UserRepository $repos,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         $user = new User();
+        $centre=$reposo->find(1);
         $request=$request->getContent();
         $form=json_decode($request,true);
         $user->setEmail($form['email']);
         $user->setActif('non');
         $user->setNom($form['nom']);
         $user->setPrenom($form['prenom']);
+        $user->setCentre($centre);
         $user->setTel($form['tel']);
-        $user->setFirst(1);
+        $user->setFirst(0);
+        //$user->setSlug($enccoder->encodePassword($user,$user->getSlug()));
         $user->setPassword($enccoder->encodePassword($user,$form['password']));
         if($repos->findAll()){
             $user->setRoles(['ROLE_USER']);
@@ -48,16 +49,8 @@ class RegistrationController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
-        // generate a signed url and email it to the user
-        $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-            (new TemplatedEmail())
-                ->from(new Address('mmd1996.m@gmail.com', 'Confirmation inscription'))
-                ->to($user->getEmail())
-                ->subject('Confirmation Inscription')
-                ->htmlTemplate('registration/confirmation_email.html.twig')
-        );
         // do anything else you need here, like send an email
-        return $this->json('ok');
+        return $this->json('ok',200);
     }
 
     /**

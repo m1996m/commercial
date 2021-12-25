@@ -96,9 +96,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $image;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Produitvendu::class, mappedBy="user")
+     */
+    private $produitvendus;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Vente::class, mappedBy="user")
+     */
+    private $ventes;
+
     public function __construct()
     {
         $this->rayons = new ArrayCollection();
+        $this->produitvendus = new ArrayCollection();
+        $this->ventes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -336,6 +348,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setImage(?string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Produitvendu[]
+     */
+    public function getProduitvendus(): Collection
+    {
+        return $this->produitvendus;
+    }
+
+    public function addProduitvendu(Produitvendu $produitvendu): self
+    {
+        if (!$this->produitvendus->contains($produitvendu)) {
+            $this->produitvendus[] = $produitvendu;
+            $produitvendu->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitvendu(Produitvendu $produitvendu): self
+    {
+        if ($this->produitvendus->removeElement($produitvendu)) {
+            // set the owning side to null (unless already changed)
+            if ($produitvendu->getUser() === $this) {
+                $produitvendu->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Vente[]
+     */
+    public function getVentes(): Collection
+    {
+        return $this->ventes;
+    }
+
+    public function addVente(Vente $vente): self
+    {
+        if (!$this->ventes->contains($vente)) {
+            $this->ventes[] = $vente;
+            $vente->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVente(Vente $vente): self
+    {
+        if ($this->ventes->removeElement($vente)) {
+            // set the owning side to null (unless already changed)
+            if ($vente->getUser() === $this) {
+                $vente->setUser(null);
+            }
+        }
 
         return $this;
     }

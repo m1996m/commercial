@@ -80,22 +80,54 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
 
-    public function getAll()
+    public function getAll($idCentre)
     {
         return $this->createQueryBuilder('e')
-            ->select('e.id,e.nom,e.prenom,e.tel')
-            ->orderBy('e.id', 'DESC')
+            ->join('e.centre','centre')
+            ->select('e.slug,e.id,e.nom,e.prenom,e.tel,centre.nom as nomCentre,e.actif')
+            ->where('centre.id=:idCentre')
+            ->setParameter('idCentre',$idCentre)
+            ->orderBy('e.id','DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getOneUser($idUser)
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.centre','centre')
+            ->select('e.id,e.nom,e.prenom,e.tel,centre.nom as nomCentre,e.actif,e.roles,e.fonction,e.slug')
+            ->where('e.slug=:idUser')
+            ->setParameter('idUser',$idUser)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
 
     //Rechercher un user
-    public function rechercherEmploye($tel)
+    public function rechercherEmploye($value,$idCentre)
     {
         return $this->createQueryBuilder('e')
-            ->Where('e.tel=:tel')
-            ->setParameter('tel', $tel)
+            ->join('e.centre','centre')
+            ->select('e.id,e.nom,e.prenom,e.tel,centre.nom as nomCentre,,e.slug,e.fonction')
+            ->where('e.nom LIKE:nom')
+            ->orwhere('e.prenom LIKE:prenom')
+            ->orwhere('e.tel LIKE:tel')
+            ->andwhere('centre.id=:idCentre')
+            ->setParameters(['nom'=>'%'.$value.'%','prenom'=>'%'.$value.'%','tel'=>'%'.$value.'%','idCentre'=>$idCentre])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getUser($email)
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.centre',"c")
+            ->select('e.id,e.nom,e.prenom,e.email,e.slug,e.tel,c.id as idCentre,c.nom as nomCentre,c.tel as telCentre,c.adresse as adresseCentre,c.ville as ville,c.pays as pays')
+            ->Where('e.email=:email')
+            ->setParameter('email', $email)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()

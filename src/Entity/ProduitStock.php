@@ -64,6 +64,11 @@ class ProduitStock
      */
     private $rayons;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $prise;
+
     public function __construct()
     {
         $this->rayons = new ArrayCollection();
@@ -196,6 +201,18 @@ class ProduitStock
                 $rayon->setProduitStock(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPrise(): ?int
+    {
+        return $this->prise;
+    }
+
+    public function setPrise(?int $prise): self
+    {
+        $this->prise = $prise;
 
         return $this;
     }

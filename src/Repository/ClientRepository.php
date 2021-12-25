@@ -51,12 +51,16 @@ class ClientRepository extends ServiceEntityRepository
     */
 
     //Rechercher client
-    public function rechercherClient($value)
+    public function rechercherClient($value,$idCentre)
     {
         return $this->createQueryBuilder('c')
+            ->join('c.centre','centre')
             ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
-            ->Where('c.tel = :tel')
-            ->setParameter('tel', $value)
+            ->Where('c.tel LIKE :tel')
+            ->OrWhere('c.nom LIKE :nom')
+            ->OrWhere('c.prenom LIKE :prenom')
+            ->andWhere('centre.id = :idCentre')
+            ->setParameterS(['tel'=> '%'.$value.'%','nom'=> '%'.$value.'%','prenom'=> '%'.$value.'%','idCentre'=> $idCentre])
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getOneOrNullResult()

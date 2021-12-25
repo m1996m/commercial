@@ -20,15 +20,14 @@ class StockController extends AbstractController
     /**
      * @Route("/stock", name="stock_index", methods={"GET"})
      */
-    public function index(StockRepository $stockRepository,CentreRepository $repos): Response
+    public function index(StockRepository $stockRepository): Response
     {
         $defaultContent=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet, $format,$context){
                 return "Symfony 5";
             }
         ];
-        $user=$repos->find(1); 
-        return $this->json($stockRepository->getAll($user),200,[],$defaultContent);
+        return $this->json($stockRepository->getAll(1),200,[],$defaultContent);
     }
 
     /**
@@ -39,7 +38,7 @@ class StockController extends AbstractController
         $stock = new Stock();
         $request=$request->getContent();
         $form=json_decode($request, true);
-        $centre=$repos->find($form['centre']);
+        $centre=$repos->find($form['idCentre']);
         $stock->setNom($form['nom']);
         $stock->setAdresse($form['adresse']);
         $stock->setCentre($centre);
@@ -52,14 +51,14 @@ class StockController extends AbstractController
     /**
      * @Route("/getOneStock/{id}", name="stock_show", methods={"GET"})
      */
-    public function show(Stock $stock): Response
+    public function show(StockRepository $stockRepository,$id): Response
     {
         $defaultContent=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet, $format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($stock,200,[],$defaultContent);
+        return $this->json($stockRepository->getOneStoke($id,1),200,[],$defaultContent);
     }
 
     /**
@@ -74,7 +73,7 @@ class StockController extends AbstractController
         ];
         $request=$request->getContent();
         $form=json_decode($request, true);
-        $centre=$repos->find($form['centre']);
+        $centre=$repos->find($form['idCentre']);
         $stock->setNom($form['nom']);
         $stock->setAdresse($form['adresse']);
         $stock->setCentre($centre);
@@ -120,7 +119,6 @@ class StockController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        $centre=$centreR->find($content['centre']);
-        return $this->json($repos->rechercherStock($content['nom'],$centre),200,[],$defaultContent);
+        return $this->json($repos->rechercherStock($content['nom'],$content['idCentre']),200,[],$defaultContent);
     }
 }

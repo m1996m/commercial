@@ -48,14 +48,38 @@ class TypeProduitRepository extends ServiceEntityRepository
         ;
     }
     */
-    public function getAll(Centre $centre)
+    public function getAll($idCentre)
     {
         return $this->createQueryBuilder('t')
+            ->join('t.centre','centre')
             ->select("t.type,t.id")
-            ->andWhere('t.centre = :centre')
-            ->setParameter('centre',$centre)
+            ->andWhere('centre.id = :centre')
+            ->setParameter('centre',$idCentre)
             ->getQuery()
             ->getResult()
+        ;
+    }
+    public function getOneTypeProduit($idTypeProduit)
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.centre','centre')
+            ->select("t.type,t.id,centre.nom as nomCentre,centre.id as idCentre")
+            ->andWhere('t.id = :centre')
+            ->setParameter('centre',$idTypeProduit)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function verificationTypeProduit($typeProduit)
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.centre','centre')
+            ->select("t.id")
+            ->andWhere('t.type = :type')
+            ->setParameter('type',$typeProduit)
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
     }
 }

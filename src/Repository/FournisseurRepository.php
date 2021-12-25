@@ -48,13 +48,17 @@ class FournisseurRepository extends ServiceEntityRepository
         ;
     }
     */
-    //Rechercher client
-    public function rechercherFournisseur($value)
+    //fournisseur
+    public function rechercherFournisseur($value,$idCentre)
     {
         return $this->createQueryBuilder('c')
-            ->Where('c.tel = :tel')
+        ->join('c.centre','centre')
             ->select('c.nom,c.tel,c.id, c.prenom, c.adresse')
-            ->setParameter('tel', $value)
+            ->Where('c.tel LIKE :tel')
+            ->OrWhere('c.nom LIKE :nom')
+            ->OrWhere('c.prenom LIKE :prenom')
+            ->andWhere('c.centre = :idCentre')
+            ->setParameterS(['tel'=> '%'.$value.'%','nom'=> '%'.$value.'%','prenom'=> '%'.$value.'%','idCentre'=> $idCentre])
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getOneOrNullResult()

@@ -51,7 +51,17 @@ class VenteRepository extends ServiceEntityRepository
     }
     */
 
-    public function getOne($id)
+    public function rechercherDernierObjet()
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function getOneVente($id)
     {
         return $this->createQueryBuilder('v')
             ->join('v.client','client')

@@ -52,47 +52,65 @@ class ProduitRepository extends ServiceEntityRepository
     }
     */
     //rechercher produit en fonction de la designation
-    public function rechercherProduit($value,Centre $centre,$id)
+    public function rechercherProduit($value,$idCentre,$idProduit)
     {
         return $this->createQueryBuilder('p')
             ->join('p.type','type')
             ->join('type.centre','centre')
-            ->select('p.designation,p.PUA,p.PUV,p.id,type.type,type.id,centre.id,centre.nom,centre.adresse')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.id as idCentre,centre.nom as nomCentre,centre.adresse as adresseCentre')
             ->Where('p.designation = :val')
             ->orWhere('p.id=:id')
-            ->andWhere('type.centre = :centre')
-            ->setParameters(['val'=> $value,'centre'=>$centre,'id'=>$id])
+            ->andWhere('centre.id = :centre')
+            ->setParameters(['val'=> $value,'centre'=>$idCentre,'id'=>$idProduit])
+            ->orderBy('p.designation', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    //rechercher produit instanement
+    public function rechercherProduitInstatane($value,$idCentre)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.type','type')
+            ->join('type.centre','centre')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.id as idCentre,centre.nom as nomCentre,centre.adresse as adresseCentre')
+            ->Where('p.designation LIKE :val')
+            ->orWhere('type.type LIKE :type')
+            ->andWhere('centre.id = :centre')
+            ->setParameters(['val'=>'%'.$value.'%' ,'type'=>'%'.$value.'%' ,'centre'=>$idCentre])
+            ->orderBy('p.designation', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+
+    //rechercher produit en fonction de la designation
+    public function rechercherProduitID($idCentre,$id)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.type','type')
+            ->join('type.centre','centre')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.id as idCentre,centre.nom as nomCentre,centre.adresse as adresseCentre')                ->orWhere('p.id=:id')
+            ->andWhere('centre.id = :centre')
+            ->setParameters(['centre'=>$idCentre,'id'=>$id])
             ->orderBy('p.designation', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
     }
 
-        //rechercher produit en fonction de la designation
-        public function rechercherProduitID(Centre $centre,$id)
-        {
-            return $this->createQueryBuilder('p')
-                ->join('p.type','type')
-                ->join('type.centre','centre')
-                ->select('p.designation,p.PUA,p.PUV,p.id,type.type,type.id,centre.id,centre.nom,centre.adresse')
-                ->orWhere('p.id=:id')
-                ->andWhere('type.centre = :centre')
-                ->setParameters(['centre'=>$centre,'id'=>$id])
-                ->orderBy('p.designation', 'ASC')
-                ->getQuery()
-                ->getOneOrNullResult();
-        }
-
     //rechercher produit en fonction de la designation et du type
-    public function rechercherProduitTypeDesignation($value,TypeProduit $type,Centre $centre): ?Produit
+    public function rechercherProduitTypeDesignation($value,$idTypeProduit,$idCentre): ?Produit
     {
             return $this->createQueryBuilder('p')
             ->join('p.type','type')
             ->join('type.centre','centre')
-            ->select('p.designation,p.PUA,p.PUV,p.id,type.type,type.id,centre.id,centre.nom,centre.adresse')
-            ->Where('p.designation = :val')
-            ->andWhere('p.type = :type')
-            ->andWhere('centre = :centre')
-            ->setParameters(['val'=> $value,'type'=>$type,'centre'=>$centre])
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.id as idCentre,centre.nom as nomCentre,centre.adresse as adresseCentre')            ->Where('p.designation = :val')
+            ->andWhere('p.designation = :val')
+            ->andWhere('type.id = :type')
+            ->andWhere('centre.id = :centre')
+            ->setParameters(['val'=> $value,'type'=>$idTypeProduit,'centre'=>$idCentre])
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -103,8 +121,7 @@ class ProduitRepository extends ServiceEntityRepository
         $qb= $this->createQueryBuilder('p')
             ->join('p.type','type')
             ->join('type.centre','centre')
-            ->select('p.id,p.designation,p.PUA,p.PUV,type.type,type.id,centre.id,centre.nom,centre.adresse')
-            ->Where('type.centre = :val')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit')            ->Where('type.centre = :val')
             ->setParameter('val', $centre)
             ->orderBy('p.designation', 'ASC');
             $query = $qb->getQuery();
@@ -112,11 +129,10 @@ class ProduitRepository extends ServiceEntityRepository
     }
     public function getOneProduit($id,Centre $centre)
     {
-            return $this->createQueryBuilder('p')
+        return $this->createQueryBuilder('p')
             ->join('p.type','type')
             ->join('type.centre','centre')
-            ->select('p.designation,p.PUA,p.PUV,p.id,type.type,type.id,centre.id,centre.nom,centre.adresse')
-            ->andWhere('p.id = :id')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.id as idCentre,centre.nom as nomCentre,centre.adresse as adresseCentre')            ->andWhere('p.id = :id')
             ->andWhere('centre = :centre')
             ->setParameters(['id'=> $id,'centre'=>$centre])
             ->getQuery()

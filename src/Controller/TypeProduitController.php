@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Centre;
 use App\Entity\TypeProduit;
 use App\Form\TypeProduitType;
 use App\Repository\CentreRepository;
 use App\Repository\TypeProduitRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\CssSelector\Node\AbstractNode;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,20 +27,20 @@ class TypeProduitController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        $centre=$repos->find(1);
-        return $this->json($typeProduitRepository->getAll($centre),200,[],$defaultContext);
+        return $this->json($typeProduitRepository->getAll(1),200,[],$defaultContext);
     }
 
     /**
      * @Route("/type/produit/new", name="type_produit_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request,CentreRepository $repos): Response
     {
         $typeProduit = new TypeProduit();
         $request=$request->getContent();
         $form=json_decode($request,true);
         $typeProduit->settype($form['type']);
-        $typeProduit->setCentre($this->getUser()->getCentre());
+        $centre=$repos->find(1);
+        $typeProduit->setCentre($centre);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($typeProduit);
         $entityManager->flush();
@@ -48,14 +50,14 @@ class TypeProduitController extends AbstractController
     /**
      * @Route("/getOneTypeProduit/{id}", name="type_produit_show", methods={"GET"})
      */
-    public function show(TypeProduit $typeProduit): Response
+    public function show(TypeProduitRepository $typeProduitRepository,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($typeProduit,200,[],$defaultContext);
+        return $this->json($typeProduitRepository->getOneTypeProduit($id),200,[],$defaultContext);
     }
 
     /**
@@ -86,7 +88,7 @@ class TypeProduitController extends AbstractController
         return $this->json('Suppression reussie', 200);
     }
     /**
-     * @Route("/verificationUniciteTypeProduit", name="verificationUniciteTypeProduit", methods={"GET"})
+     * @Route("/verificationUniciteTypeProduit", name="verificationUniciteTypeProduit", methods={"GET","POST"})
      */
     public function verificationUniciteTypeProduit(TypeProduitRepository $repos,Request $request): Response
     {
@@ -97,6 +99,6 @@ class TypeProduitController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->findOneBy(['type'=>$content['type']]),200,[],$defaultContext);
+        return $this->json($repos->verificationTypeProduit($content['type']),200,[],$defaultContext);
     }
 }

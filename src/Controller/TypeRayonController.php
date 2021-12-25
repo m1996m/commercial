@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\TypeRayon;
 use App\Form\TypeRayonType;
+use App\Repository\CentreRepository;
 use App\Repository\TypeRayonRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,18 +18,20 @@ class TypeRayonController extends AbstractController
      */
     public function index(TypeRayonRepository $typeRayonRepository): Response
     {
-        return $this->json($typeRayonRepository->findAll(),200);
+        return $this->json($typeRayonRepository->getAllTypeRayon(1),200);
     }
 
     /**
      * @Route("/type/rayon/new", name="type_rayon_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request,CentreRepository $repos): Response
     {
         $typeRayon = new TypeRayon();
         $request=$request->getContent();
         $form=json_decode($request,true);
+        $centre=$repos->find(1);
         $typeRayon->setDesignation($form['designation']);
+        $typeRayon->setCentre($centre);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($typeRayon);
         $entityManager->flush();
@@ -36,25 +39,25 @@ class TypeRayonController extends AbstractController
     }
 
     /**
-     * @Route("/getTypeRayon/{id}", name="type_rayon_show", methods={"GET"})
+     * @Route("/getOneTypeRayon/{id}", name="type_rayon_show", methods={"GET","POST"})
      */
-    public function show(TypeRayon $typeRayon): Response
+    public function show(TypeRayonRepository $repos,$id): Response
     {
-        return $this->json($typeRayon,200);
+        return $this->json($repos->getOneTypeRayon(1,$id),200);
     }
 
     /**
-     * @Route("/verificationTypeRayon", name="verificationTypeRayon", methods={"GET"})
+     * @Route("/verificationTypeRayon", name="verificationTypeRayon", methods={"GET","POST"})
      */
     public function verificationTypeRayon(TypeRayonRepository $repos,Request $request): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->verificationTypeRayon($content['designation']),200);
+        return $this->json($repos->verificationTypeRayon($content['designation'],1),200);
     }
 
     /**
-     * @Route("/getAndEdittypeRayon/{id}", name="type_rayon_edit", methods={"GET","POST"})
+     * @Route("/getAndEditTypeRayon/{id}", name="type_rayon_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, TypeRayon $typeRayon): Response
     {
@@ -66,7 +69,7 @@ class TypeRayonController extends AbstractController
     }
 
     /**
-     * @Route("/getDelete/{id}", name="type_rayon_delete", methods={"POST"})
+     * @Route("/getDeleteTypeRayon/{id}", name="type_rayon_delete", methods={"POST"})
      */
     public function delete(Request $request, TypeRayon $typeRayon): Response
     {
