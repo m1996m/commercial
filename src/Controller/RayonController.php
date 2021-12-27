@@ -191,13 +191,15 @@ class RayonController extends AbstractController
     public function verificationQuantite(Request $request,RayonRepository $repos): Response
     {
         $request=$request->getContent();
-        $content=json_decode($request,true);
+        $contents=json_decode($request,true);
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->verificationQuantite($content['idRayon'],$content['quantiteVendu']),200,[],$defaultContext);
+        foreach($contents as $content){
+            return $this->json($repos->verificationQuantite($content['idRayon'],$content['quantiteVendu']));
+        }
     }
 
     /**

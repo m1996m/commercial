@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class CentreController extends AbstractController
 {
@@ -127,5 +129,15 @@ class CentreController extends AbstractController
         $request=$request->getContent();
         $content=json_decode($request,true);
         return $this->json($repos->getemail($content['email']),200);
+    }
+
+       /**
+     * @IsGranted("ROLE_USER")
+     * @Route("api/proteger", name="proteger", methods={"GET"})
+     */
+    public function proteger()
+    {
+       
+        return $this->json(['nom', 'Barry'], 200);
     }
 }

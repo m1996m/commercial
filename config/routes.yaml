@@ -1,4 +1,4 @@
-api_login_check:
+authentication_token:
     path: /api/login_check
 
 

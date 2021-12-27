@@ -204,8 +204,7 @@ class RayonRepository extends ServiceEntityRepository
             ->select("s.quantite,s.prise")
             ->Where('s.id = :id')
             ->andWhere('s.quantite <:quantite')
-            ->setParameters(['id'=> $idRayon,'quantite'=>(int)'s.prise'+$quantite])
-            ->orderBy('s.id', 'DESC')
+            ->setParameters(['id'=> $idRayon,'quantite'=>(int)'s.prise'+(int)$quantite])
             ->getQuery()
             ->getOneOrNullResult()
         ;
