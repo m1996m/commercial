@@ -88,7 +88,7 @@ class FournisseurCentreRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-    public function rechercherClient($value,$idCentre)
+    public function rechercherFournisseur($value,$idCentre)
     {
         return $this->createQueryBuilder('cl')
             ->join('cl.fournisseur','c')

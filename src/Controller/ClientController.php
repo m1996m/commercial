@@ -84,7 +84,7 @@ class ClientController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherClient($content['idClient'],1),200,[],$defaultContext);
+        return $this->json($repos->rechercherClient($content['content'],1),200,[],$defaultContext);
     }
 
     /**

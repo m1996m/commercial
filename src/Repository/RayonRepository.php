@@ -8,6 +8,7 @@ use App\Entity\Rayon;
 use App\Entity\TypeRayon;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PDO;
 
 /**
  * @method Rayon|null find($id, $lockMode = null, $lockVersion = null)
@@ -65,9 +66,10 @@ class RayonRepository extends ServiceEntityRepository
             ->join('p.type','t')
             ->join('stock.centre','centre')
             ->select("type.designation as designationType,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
-            ->andWhere('p.designation LIKE :idS')
+            ->orWhere('p.designation LIKE :idS')
+            ->orWhere('t.type LIKE :types')
             ->andWhere('centre.id = :id')
-            ->setParameters(['idS'=>'%'.$designation.'%','id'=>$idCentre])
+            ->setParameters(['idS'=>'%'.$designation.'%','types'=>'%'.$designation.'%','id'=>$idCentre])
             ->orderBy('r.type', 'ASC')
             ->getQuery()
             ->getResult()
@@ -114,16 +116,16 @@ class RayonRepository extends ServiceEntityRepository
     public function getAll($idCentre)
     {
         return $this->createQueryBuilder('r')
+            ->select("type.designation as designationType,r.prise,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
             ->join('r.type','type')
             ->join('r.produitStock','ps')
             ->join('ps.stock','stock')
             ->join('ps.produit','p')
             ->join('p.type','t')
             ->join('stock.centre','centre')
-            ->select("type.designation as designationType,r.quantite,r.prise,t.type as typeProduit,p.id as idProduit, p.designation as designationProduit,stock.id as idSock,ps.PUA as PUAProduitStock,ps.PUV as PUVProduitStock,stock.nom as designationStock, ps.id as idProduitStock, type.id as idType,centre.nom as nomCentre,r.quantite,r.id,centre.id as idCentre")
             ->Where('centre.id = :val')
-            ->andWhere('r.quantite >= :quantite')
-            ->setParameters(['val'=> $idCentre,'quantite'=>(int)'s.quantite'-(int)'s.prise'])
+            ->andWhere('r.quantite > r.prise')
+            ->setParameter('val',$idCentre)
             ->orderBy('r.quantite', 'ASC')
             ->setMaxResults(7)
             ->getQuery()
@@ -172,8 +174,8 @@ class RayonRepository extends ServiceEntityRepository
             ->join('p.type','t')
             ->select("SUM(r.quantite) as totalQuantite,SUM(r.prise) as totalprise")
             ->andWhere('p.id = :idProduit')
-            ->andWhere('r.quantite > :quantite')
-            ->setParameters(['idProduit'=>$idProduit,'quantite'=>'r.prise'])
+            ->andWhere('r.quantite > r.prise')
+            ->setParameters(['idProduit'=>$idProduit])
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -190,9 +192,9 @@ class RayonRepository extends ServiceEntityRepository
             ->join('p.type','t')
             ->select("r.id as idRayon,t.type as typeProduit,tr.id as idType,p.id as idP,f.id as idf,s.id as idStock,r.quantite as quantiteRayon,r.prise")
             ->andWhere('p.id = :idProduit')
-            ->andWhere('r.quantite > :quantite')
+            ->andWhere('r.quantite > r.prise')
             ->andWhere('r.prise > :prise')
-            ->setParameters(['idProduit'=>$idProduit,'quantite'=>'r.prise','prise'=>0])
+            ->setParameters(['idProduit'=>$idProduit,'prise'=>0])
             ->getQuery()
             ->getResult()
         ;

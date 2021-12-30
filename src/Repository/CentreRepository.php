@@ -58,11 +58,24 @@ class CentreRepository extends ServiceEntityRepository
             ->orWhere('c.email LIKE :email')
             ->orWhere('c.pays LIKE :pays')
             ->orWhere('c.ville LIKE :ville')
+            ->select('c.nom,c.tel,c.email,c.id,c.adresse,c.pays,c.ville')
             ->setParameters(['nom'=>'%'.$centre.'%','tel'=>'%'.$centre.'%','email'=>'%'.$centre.'%','pays'=>'%'.$centre.'%','ville'=>'%'.$centre.'%'])
             ->orderBy('c.nom','ASC')
             ->setMaxResults(5)
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function getOneCentre($idCentre)
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.id LIKE :id')
+            ->select('c.nom,c.tel,c.email,c.id,c.adresse,c.pays,c.ville')
+            ->setParameters(['id'=>$idCentre])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
         ;
     }
 

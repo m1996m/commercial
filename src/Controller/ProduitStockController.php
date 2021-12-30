@@ -43,29 +43,31 @@ class ProduitStockController extends AbstractController
      */
     public function new(Request $request,FournisseurCentreRepository $repos): Response
     {
-        $produitStock = new ProduitStock();
-        $prise=0;
         $request=$request->getContent();
-        $form=json_decode($request,true);
-        if(sizeof($form)==11){
-            $prise=$form['prise1'];
+        $forms=json_decode($request,true);
+        foreach($forms as $form){
+            $prise=0;
+            if(sizeof($form)==11){
+                $prise=$form['prise1'];
+            }
+            $produitStock = new ProduitStock();
+            $entityManager = $this->getDoctrine()->getManager();
+            $produit=$entityManager->getRepository(Produit::class)->find($form['idProduit']);
+            $user=$entityManager->getRepository(User::class)->find(1);
+            $fournisseur=$entityManager->getRepository(Fournisseur::class)->find($form['idf']);
+            $stock=$entityManager->getRepository(Stock::class)->find($form['ids']);
+            $produitStock->setPUV($form['PUV']);
+            $produitStock->setPUA($form['PUA']);
+            $produitStock->setPrise(0);
+            $produitStock->setQuantite((int)$form['quantity']-$prise);
+            $produitStock->setCreateAt(new \DateTime());
+            $produitStock->setProduit($produit);
+            $produitStock->setStock($stock);
+            $produitStock->setUser($user);
+            $produitStock->setFournisseur($fournisseur);
+            $entityManager->persist($produitStock);
+            $entityManager->flush();
         }
-        $entityManager = $this->getDoctrine()->getManager();
-        $produit=$entityManager->getRepository(Produit::class)->find($form['idProduit']);
-        $user=$entityManager->getRepository(User::class)->find(1);
-        $fournisseur=$entityManager->getRepository(Fournisseur::class)->find($form['idf']);
-        $stock=$entityManager->getRepository(Stock::class)->find($form['ids']);
-        $produitStock->setPUV($form['PUV']);
-        $produitStock->setPUA($form['PUA']);
-        $produitStock->setPrise(0);
-        $produitStock->setQuantite((int)$form['quantity']-$prise);
-        $produitStock->setCreateAt(new \DateTime());
-        $produitStock->setProduit($produit);
-        $produitStock->setStock($stock);
-        $produitStock->setUser($user);
-        $produitStock->setFournisseur($fournisseur);
-        $entityManager->persist($produitStock);
-        $entityManager->flush();
         
         //Ajout du fournisseur centre
         // $clientCentre=new FournisseurCentre();
@@ -97,15 +99,12 @@ class ProduitStockController extends AbstractController
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
-        $entityManager = $this->getDoctrine()->getManager();
-        $produit=$entityManager->getRepository(Produit::class)->find($content['idP']);
-        $stock=$entityManager->getRepository(Stock::class)->find($content['ids']);
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
                 return "Symfony 5";
             },
         ];
-        return $this->json($repos->getProduit($produit,$stock),200,[],$defaultContext);
+        return $this->json($repos->getProduit($content['content'],1),200,[],$defaultContext);
     }
 
     /**

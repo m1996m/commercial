@@ -102,7 +102,7 @@ class FournisseurController extends AbstractController
     /**
      * @Route("/rechercherfournisseur", name="rechercherFournisseur", methods={"GET","POST"})
      */
-    public function rechercherFournisseur(Request $request, FournisseurRepository $repos): Response
+    public function rechercherFournisseur(Request $request, FournisseurCentreRepository $repos): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){

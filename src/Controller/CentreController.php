@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Centre;
-use App\Form\CentreType;
 use App\Repository\CentreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class CentreController extends AbstractController
@@ -53,14 +51,14 @@ class CentreController extends AbstractController
     /**
      * @Route("/getOneCentre/{id}", name="centre_show", methods={"GET"})
      */
-    public function show(Centre $centre): Response
+    public function show(CentreRepository $centreRepository,$id): Response
     {
         $defaultContext=[
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
                 return "Symfony 5";
             }
         ];
-        return $this->json($centre,200,[],$defaultContext);
+        return $this->json($centreRepository->getOneCentre($id),200,[],$defaultContext);
     }
     
 

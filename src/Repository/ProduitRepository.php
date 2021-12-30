@@ -121,7 +121,8 @@ class ProduitRepository extends ServiceEntityRepository
         $qb= $this->createQueryBuilder('p')
             ->join('p.type','type')
             ->join('type.centre','centre')
-            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit')            ->Where('type.centre = :val')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,type.id as idTypeDesignationProduit,centre.nom as nomCentre,centre.adresse as adresseCentre')
+            ->Where('type.centre = :val')
             ->setParameter('val', $centre)
             ->orderBy('p.designation', 'ASC');
             $query = $qb->getQuery();

@@ -59,20 +59,22 @@ class ProduitStockRepository extends ServiceEntityRepository
     */
 
     //Cette fonction permet de rechercher un produit dans la table produitStock en fonction du produit et le stock
-    public function getProduit(Produit $produit,Stock $stock)
+    public function getProduit($produit,$idCentre)
     {
         return $this->createQueryBuilder('s')
-            //->select('p.id')
             ->join('s.user','user')
             ->join('s.fournisseur ','f')
             ->join('s.produit ','produit')
             ->join('s.stock ','stock')
             ->join('produit.type','type')
+            ->join('type.centre','centre')
             ->select("f.id,f.nom,f.prenom,f.tel,f.adresse,type.type,type.id,produit.id,produit.designation,s.id,s.PUA,s.PUV,s.quantite,stock.nom,user.id,user.nom,user.prenom")
-            ->Where('s.produit = :produit')
-            ->andWhere('s.stock = :stock')
-            ->andWhere('s.quantite > :quantite')
-            ->setParameters(['produit'=> $produit,'stock'=>$stock,'quantite'=>'s.prise'])
+            ->OrWhere('produit.designation LIKE :designation')
+            ->OrWhere('type.type LIKE :type')
+            ->andWhere('centre.id =:idCentre')
+            ->andWhere('s.quantite > s.prise')
+            ->setParameters(['designation'=> '%'.$produit.'%','type'=> '%'.$produit.'%','idCentre'=> $idCentre])
+            ->setMaxResults(7)
             ->getQuery()
             ->getResult()
         ;
@@ -173,8 +175,7 @@ class ProduitStockRepository extends ServiceEntityRepository
             ->select("s.quantite,s.prise")
             ->Where('s.id = :id')
             ->andWhere('s.quantite <:quantite')
-            ->setParameters(['id'=> $idStock,'quantite'=>$quantite+(int)'s.prise'])
-            ->orderBy('s.id', 'DESC')
+            ->setParameters(['id'=> $idStock,'quantite'=>(int)($quantite)+(int)'s.prise'])
             ->getQuery()
             ->getOneOrNullResult()
         ;
