@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Fournisseur;
 use App\Entity\FournisseurCentre;
-use App\Form\FournisseurType;
 use App\Repository\CentreRepository;
 use App\Repository\FournisseurCentreRepository;
 use App\Repository\FournisseurRepository;
@@ -17,7 +16,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class FournisseurController extends AbstractController
 {
     /**
-     * @Route("/fournisseur", name="fournisseur_index", methods={"GET"})
+     * @Route("/api/fournisseur", name="fournisseur_index", methods={"GET"})
      */
     public function index(FournisseurCentreRepository $fournisseurRepository,CentreRepository $repos): Response
     {
@@ -26,12 +25,11 @@ class FournisseurController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        $centre=$repos->find(1);
-        return $this->json($fournisseurRepository->getAll($centre),200,[],$defaultContext);
+        return $this->json($fournisseurRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/fournisseur/new", name="fournisseur_new", methods={"GET","POST"})
+     * @Route("/api/fournisseur/new", name="fournisseur_new", methods={"GET","POST"})
      */
     public function new(Request $request,FournisseurRepository $repos,CentreRepository $reposCentre): Response
     {
@@ -46,9 +44,8 @@ class FournisseurController extends AbstractController
         $entityManager->persist($fournisseur);
         $entityManager->flush();
         $fournisseurCentre = new FournisseurCentre();
-        $centre=$reposCentre->find(1);
         $fournisseur=$repos->findOneBy(['tel'=>$form['tel']]);
-        $fournisseurCentre->setCentre($centre);
+        $fournisseurCentre->setCentre($this->getUser()->getCentre());
         $fournisseurCentre->setFournisseur($fournisseur);
         $entityManager->persist($fournisseurCentre);
         $entityManager->flush();
@@ -56,7 +53,7 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/getOnefournisseur/{slug}", name="fournisseur_show", methods={"GET","POST"})
+     * @Route("/api/getOnefournisseur/{slug}", name="fournisseur_show", methods={"GET","POST"})
      */
     public function show(FournisseurCentreRepository $repos,$slug): Response
     {
@@ -65,11 +62,11 @@ class FournisseurController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->getOneFournisseur(1,$slug),200,[],$defaultContext);
+        return $this->json($repos->getOneFournisseur($this->getUser()->getCentre()->getId(),$slug),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/getAndEditFournisseur/{slug}", name="fournisseur_edit", methods={"GET","POST"})
+     * @Route("/api/getAndEditFournisseur/{slug}", name="fournisseur_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Fournisseur $fournisseur,FournisseurCentreRepository $fc,FournisseurRepository $repos,CentreRepository $reposCentre): Response
     {
@@ -89,7 +86,7 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/getDeleteFournisseur/{slug}", name="fournisseur_delete", methods={"POST"})
+     * @Route("/api/getDeleteFournisseur/{slug}", name="fournisseur_delete", methods={"POST"})
      */
     public function delete(Request $request, Fournisseur $fournisseur): Response
     {
@@ -100,7 +97,7 @@ class FournisseurController extends AbstractController
     }
 
     /**
-     * @Route("/rechercherfournisseur", name="rechercherFournisseur", methods={"GET","POST"})
+     * @Route("/api/rechercherfournisseur", name="rechercherFournisseur", methods={"GET","POST"})
      */
     public function rechercherFournisseur(Request $request, FournisseurCentreRepository $repos): Response
     {
@@ -111,10 +108,10 @@ class FournisseurController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherFournisseur($content['content'],1),200,[],$defaultContext);
+        return $this->json($repos->rechercherFournisseur($content['content'],$this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
     /**
-     * @Route("/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET","POST"})
+     * @Route("/api/verificationUniciteTelFournisseur", name="verificationUniciteTelFournisseur", methods={"GET","POST"})
      */
     public function verificationUniciteTelFournisseur(FournisseurCentreRepository $repos,Request $request): Response
     {

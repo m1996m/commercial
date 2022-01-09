@@ -29,14 +29,12 @@ class RegistrationController extends AbstractController
     public function register(CentreRepository $reposo,Request $request,UserRepository $repos,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         $user = new User();
-        $centre=$reposo->find(1);
         $request=$request->getContent();
         $form=json_decode($request,true);
         $user->setEmail($form['email']);
         $user->setActif('non');
         $user->setNom($form['nom']);
         $user->setPrenom($form['prenom']);
-        $user->setCentre($centre);
         $user->setTel($form['tel']);
         $user->setFirst(0);
         //$user->setSlug($enccoder->encodePassword($user,$user->getSlug()));
@@ -49,6 +47,10 @@ class RegistrationController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
+        if($this->getUser()->getCentre()){
+            $user->setCentre($this->getUser()->getCentre());
+        }
+        $user->setSlug($enccoder->encodePassword($user,$repos->findOneBy(['email'=>$form['email']])->getSlug()));
         // do anything else you need here, like send an email
         return $this->json('ok',200);
     }

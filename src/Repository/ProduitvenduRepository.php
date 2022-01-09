@@ -116,6 +116,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.vente','vente')
             ->join('vente.client','client')
+            ->join('vente.user','user')
             ->join('p.rayon','rayon')
             ->join('rayon.type','nomRayon')
             ->join('rayon.type','type')
@@ -124,7 +125,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('ps.produit','produit')
             ->join('produit.type','tp')
             ->join('ps.stock','stock')
-            ->select("p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")
+            ->select("user.nom as nomVendeur, user.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")
             ->where('centre.id=:centre')
             ->setParameter('centre',$idCentre)
             ->orderBy('p.id', 'ASC')
@@ -138,6 +139,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.vente','vente')
             ->join('vente.client','client')
+            ->join('vente.user','user')
             ->join('p.rayon','rayon')
             ->join('rayon.type','nomRayon')
             ->join('rayon.produitStock','ps')
@@ -145,8 +147,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
             ->join('produit.type','tp')
-            ->select("p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")
-            ->where('p.id=:id')
+            ->select("useur.nom as nomVendeur, useur.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")            ->where('p.id=:id')
             ->andwhere('centre.id=:idCentre')
             ->setParameters(['id'=>$idProduitVendu,'idCentre'=>$idCentre])
             ->getQuery()
@@ -167,7 +168,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
             ->join('produit.type','tp')
-            ->select("p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")
+            ->select("user.nom as nomVendeur, user.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")            ->where('p.id=:id')
             ->where('user.id=:idUser')
             ->setParameter('idUser',$idUser)
             ->orderBy('p.id', 'DESC')
@@ -199,6 +200,8 @@ class ProduitvenduRepository extends ServiceEntityRepository
 
     public function caisse($idCentre,$date1,$date2)
     {
+        $emConfig = $this->getEntityManager()->getConfiguration();
+        $emConfig->addCustomDatetimeFunction('DATE_FORMAT', 'DoctrineExtensions\Query\Mysql\DateFormat');
         return $this->createQueryBuilder('p')
             ->join('p.vente','vente')
             ->join('vente.client','client')
@@ -209,7 +212,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('produit.type','type')
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
-            ->select("SUM(rayon.quantite) as quantiteVendu,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
+            ->select("SUM(rayon.quantite) as quantiteVendu,SUM(vente.remise) as remise,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
             ->where('centre.id=:idCentre')
             ->andwhere('vente.createdAt BETWEEN :date1 AND :date2')
             ->setParameters(['idCentre'=>$idCentre,'date1'=>$date1,'date2'=>$date2])
@@ -236,7 +239,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('produit.type','type')
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
-            ->select("SUM(p.quantite) as quantiteVendu,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
+            ->select("SUM(p.quantite) as quantiteVendu,SUM(vente.remise) as remise, produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
             ->where('centre.id=:idCentre')
             ->andwhere("YEAR(vente.createdAt)=:annee")
             ->setParameters(['idCentre'=>$idCentre,'annee'=>$date->format('Y')])
@@ -253,7 +256,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
         $emConfig->addCustomDatetimeFunction('MONTH', 'DoctrineExtensions\Query\Mysql\Month');
         $emConfig->addCustomDatetimeFunction('DAY', 'DoctrineExtensions\Query\Mysql\Day');
         $date=(new DateTime());
-        //$date=$date->format('y');
+        //$date=$date->format('y'): 
         //dd($date->format('m'));
          //dd($date->format('M'));
         return $this->createQueryBuilder('p')
@@ -266,7 +269,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('produit.type','type')
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
-            ->select("SUM(p.quantite) as quantiteVendu,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
+            ->select("SUM(p.quantite) as quantiteVendu,SUM(vente.remise) as remise,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
             ->where('centre.id=:idCentre')
             ->andwhere("MONTH(vente.createdAt)=:annee")
             ->setParameters(['idCentre'=>$idCentre,'annee'=>$date->format('m')])

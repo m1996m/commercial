@@ -14,7 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class CentreController extends AbstractController
 {
     /**
-     * @Route("/centre", name="centre_index", methods={"GET"})
+     * @Route("/api/centre", name="centre_index", methods={"GET"})
      */
     public function index(CentreRepository $centreRepository): Response
     {
@@ -49,7 +49,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/getOneCentre/{id}", name="centre_show", methods={"GET"})
+     * @Route("/api/getOneCentre/{id}", name="centre_show", methods={"GET"})
      */
     public function show(CentreRepository $centreRepository,$id): Response
     {
@@ -63,7 +63,7 @@ class CentreController extends AbstractController
     
 
     /**
-     * @Route("/rechercherCentre", name="rechercherCentre", methods={"GET","POST"})
+     * @Route("/api/rechercherCentre", name="rechercherCentre", methods={"GET","POST"})
      */
     public function rechercherCentre(CentreRepository $repos, Request $request): Response
     {
@@ -77,7 +77,7 @@ class CentreController extends AbstractController
         return $this->json($repos->rechercherCentre($valeur['content']),200,[],$defaultContext);
     }
     /**
-     * @Route("/getAndOrEditCentre/{id}", name="centre_edit", methods={"GET","POST"})
+     * @Route("/api/getAndOrEditCentre/{id}", name="centre_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Centre $centre): Response
     {
@@ -99,7 +99,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/getDeleteCentre/{id}", name="centre_delete", methods={"POST"})
+     * @Route("/api/getDeleteCentre/{id}", name="centre_delete", methods={"POST"})
      */
     public function delete(Request $request, Centre $centre): Response
     {
@@ -110,7 +110,7 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET","POST"})
+     * @Route("/api/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET","POST"})
      */
     public function verificationUniciteTel(CentreRepository $repos,Request $request): Response
     {
@@ -120,22 +120,12 @@ class CentreController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
+     * @Route("/api/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
      */
     public function verificationUniciteEmail(CentreRepository $repos,Request $request): Response
     {
         $request=$request->getContent();
         $content=json_decode($request,true);
         return $this->json($repos->getemail($content['email']),200);
-    }
-
-       /**
-     * @IsGranted("ROLE_USER")
-     * @Route("api/proteger", name="proteger", methods={"GET"})
-     */
-    public function proteger()
-    {
-       
-        return $this->json(['nom', 'Barry'], 200);
     }
 }

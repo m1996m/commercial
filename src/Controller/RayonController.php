@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class RayonController extends AbstractController
 {
     /**
-     * @Route("/rayon", name="rayon_index", methods={"GET","POST"})
+     * @Route("/api/rayon", name="rayon_index", methods={"GET","POST"})
      */
     public function index(RayonRepository $rayonRepository,Request $request): Response
     {
@@ -27,15 +27,11 @@ class RayonController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        $request=$request->getContent();
-        $content=json_decode($request,true);
-        $this->get('twig')->addGlobal('app.user','mamd');
-        //$this->setParameter('app.user');
-        return $this->json($rayonRepository->getAll(1),200,[],$defaultContext);
+        return $this->json($rayonRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/rayon/new", name="rayon_new", methods={"GET","POST"})
+     * @Route("/api/rayon/new", name="rayon_new", methods={"GET","POST"})
      */
     public function new(Request $request,RayonRepository $rayonRepository, ProduitStockRepository $produitStockRepository): Response
     {
@@ -55,10 +51,9 @@ class RayonController extends AbstractController
                 $produitStock=$produitStockRepository->find($form['idProduitStock']);
             }
             //$user=$entityManager->getRepository(User::class)->find($form['user']);
-            $user=$entityManager->getRepository(User::class)->find('1');
             $type=$entityManager->getRepository(TypeRayon::class)->find($form['idType']);
             $rayon->setCreatedAt(new \DateTime());
-            $rayon->setUser($user);
+            $rayon->setUser($this->getUser());
             $rayon->settype($type);
             $rayon->setPrise(0);
             $rayon->setProduitStock($produitStock);
@@ -74,7 +69,7 @@ class RayonController extends AbstractController
     }
 
         /**
-     * @Route("/addOne", name="addOne", methods={"GET","POST"})
+     * @Route("/api/addOne", name="addOne", methods={"GET","POST"})
      */
     public function addOne(Request $request,RayonRepository $rayonRepository, ProduitStockRepository $produitStockRepository): Response
     {
@@ -87,10 +82,9 @@ class RayonController extends AbstractController
         $produitStock=$produitStockRepository->find($produitStockRepository->getIDProduitStock($form['idProduit']));
         $prise=(int)$form['prise'];
         //$user=$entityManager->getRepository(User::class)->find($form['user']);
-        $user=$entityManager->getRepository(User::class)->find('1');
         $type=$entityManager->getRepository(TypeRayon::class)->find($form['idType']);
         $rayon->setCreatedAt(new \DateTime());
-        $rayon->setUser($user);
+        $rayon->setUser($this->getUser());
         $rayon->settype($type);
         $rayon->setPrise(0);
         $rayon->setProduitStock($produitStock);
@@ -105,7 +99,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/getOneRayon/{id}", name="rayon_show", methods={"GET","POST"})
+     * @Route("/api/getOneRayon/{id}", name="rayon_show", methods={"GET","POST"})
      */
     public function show(RayonRepository $rayonRepository,$id,CentreRepository $centreReposi): Response
     {
@@ -114,11 +108,11 @@ class RayonController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($rayonRepository->getOneRayon(1,$id),200,[],$defaultContext);
+        return $this->json($rayonRepository->getOneRayon(1,$this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/interogationRayon", name="interogationRayon", methods={"GET","POST"})
+     * @Route("/api/interogationRayon", name="interogationRayon", methods={"GET","POST"})
      */
     public function interogationRayon(Request $request,RayonRepository $repos): Response
     {
@@ -131,16 +125,16 @@ class RayonController extends AbstractController
         ];
         $rayons=[];
         if($content['idType']!=null){
-            $rayons=$repos->rechercherProduitRayon($content['idType'],1);
+            $rayons=$repos->rechercherProduitRayon($content['idType'],$this->getUser()->getCentre()->getId());
         }
         if($content['designation']!=null){
-            $rayons=$repos->rechercherProduit($content['designation'],1);
+            $rayons=$repos->rechercherProduit($content['designation'],$this->getUser()->getCentre()->getId());
         }
         return $this->json($rayons,200,[],$defaultContext);
     }
 
     /**
-     * @Route("/etatRayon", name="etatRayon", methods={"GET","POST"})
+     * @Route("/api/etatRayon", name="etatRayon", methods={"GET","POST"})
      */
     public function etatRayon(Request $request,RayonRepository $repos): Response
     {
@@ -152,11 +146,11 @@ class RayonController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->etatRayon(1),200,[],$defaultContext);
+        return $this->json($repos->etatRayon($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/ventedata", name="ventedata", methods={"GET","POST"})
+     * @Route("/api/ventedata", name="ventedata", methods={"GET","POST"})
      */
     public function vente(Request $request,RayonRepository $repos): Response
     {
@@ -171,7 +165,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/rechercherProduit", name="rechercherProduit", methods={"GET","POST"})
+     * @Route("/api/rechercherProduit", name="rechercherProduit", methods={"GET","POST"})
      */
     public function rechercherProduit(Request $request,RayonRepository $repos): Response
     {
@@ -182,11 +176,11 @@ class RayonController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($repos->rechercherProduit($content['content'],1),200,[],$defaultContext);
+        return $this->json($repos->rechercherProduit($content['content'],$this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/verificationQuantite", name="verificationQuantite", methods={"GET","POST"})
+     * @Route("/api/verificationQuantite", name="verificationQuantite", methods={"GET","POST"})
      */
     public function verificationQuantite(Request $request,RayonRepository $repos): Response
     {
@@ -203,7 +197,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/totalQuantite", name="totalQuantite", methods={"GET","POST"})
+     * @Route("/api/totalQuantite", name="totalQuantite", methods={"GET","POST"})
      */
     public function totalQuantite(Request $request,RayonRepository $repos): Response
     {
@@ -218,7 +212,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/totaldata", name="totaldata", methods={"GET","POST"})
+     * @Route("/api/totaldata", name="totaldata", methods={"GET","POST"})
      */
     public function totaldata(Request $request,RayonRepository $repos): Response
     {
@@ -233,7 +227,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/tdata", name="tdata", methods={"GET","POST"})
+     * @Route("/api/tdata", name="tdata", methods={"GET","POST"})
      */
     public function tdata(Request $request,ProduitStockRepository $repos): Response
     {
@@ -247,7 +241,7 @@ class RayonController extends AbstractController
         return $this->json($repos->totaldata($content['idProduit']),200,[],$defaultContext);
     }
     /**
-     * @Route("/getAndEditRayon/{id}", name="rayon_edit", methods={"GET","POST"})
+     * @Route("/api/getAndEditRayon/{id}", name="rayon_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Rayon $rayon,ProduitStock $ps): Response
     {
@@ -264,7 +258,7 @@ class RayonController extends AbstractController
         $type=$entityManager->getRepository(TypeRayon::class)->find($form['idType']);
         $rayon->setType($type);
         $rayon->setProduitStock($produitStock);
-        $rayon->setQuantite($form['quantite']);  
+        $rayon->setQuantite($form['quantite']); 
         $this->getDoctrine()->getManager()->flush();
         //verification si le si le stock ou la quantite a été changé 
         $ps=$produitStock;
@@ -299,7 +293,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/remplacerRayonEtStockProduit", name="remplacerRayonEtStockProduit", methods={"GET","POST"})
+     * @Route("/api/remplacerRayonEtStockProduit", name="remplacerRayonEtStockProduit", methods={"GET","POST"})
      */
     public function remplacerRayonEtStockProduit(Request $request, RayonRepository $rayonRepository): Response
     {
@@ -328,7 +322,7 @@ class RayonController extends AbstractController
     }
 
     /**
-     * @Route("/getDelete/{id}", name="rayon_delete", methods={"POST"})
+     * @Route("/api/getDelete/{id}", name="rayon_delete", methods={"POST"})
      */
     public function delete(Request $request, Rayon $rayon): Response
     {

@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Centre;
 use App\Entity\Stock;
-use App\Form\StockType;
 use App\Repository\CentreRepository;
 use App\Repository\StockRepository;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +15,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class StockController extends AbstractController
 {
     /**
-     * @Route("/stock", name="stock_index", methods={"GET"})
+     * @Route("/api/stock", name="stock_index", methods={"GET"})
      */
     public function index(StockRepository $stockRepository): Response
     {
@@ -27,21 +24,21 @@ class StockController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($stockRepository->getAll(1),200,[],$defaultContent);
+        return $this->json($stockRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContent);
     }
 
     /**
-     * @Route("/stock/new", name="stock_new", methods={"GET","POST"})
+     * @Route("/api/stock/new", name="stock_new", methods={"GET","POST"})
      */
     public function new(Request $request, CentreRepository $repos): Response
     {
         $stock = new Stock();
         $request=$request->getContent();
         $form=json_decode($request, true);
-        $centre=$repos->find($form['idCentre']);
+        //$centre=$repos->find($form['idCentre']);
         $stock->setNom($form['nom']);
         $stock->setAdresse($form['adresse']);
-        $stock->setCentre($centre);
+        $stock->setCentre($this->getUser()->getCentre());
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($stock);
         $entityManager->flush();
@@ -49,7 +46,7 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/getOneStock/{id}", name="stock_show", methods={"GET"})
+     * @Route("/api/getOneStock/{id}", name="stock_show", methods={"GET"})
      */
     public function show(StockRepository $stockRepository,$id): Response
     {
@@ -58,11 +55,11 @@ class StockController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($stockRepository->getOneStoke($id,1),200,[],$defaultContent);
+        return $this->json($stockRepository->getOneStoke($id,$this->getUser()->getCentre()->getId()),200,[],$defaultContent);
     }
 
     /**
-     * @Route("/getAndEditStock/{id}", name="stock_edit", methods={"GET","POST"})
+     * @Route("/api/getAndEditStock/{id}", name="stock_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Stock $stock,CentreRepository $repos): Response
     {
@@ -82,9 +79,9 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/getDeleteStock/{id}", name="stock_delete", methods={"POST"})
+     * @Route("/api/getDeleteStock/{id}", name="stock_delete", methods={"POST"})
      */
-    public function delete(Request $request, Stock $stock): Response
+    public function delete(Stock $stock): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($stock);
@@ -93,7 +90,7 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/rechercherStock", name="rechercherStock", methods={"GET","POST"})
+     * @Route("/api/rechercherStock", name="rechercherStock", methods={"GET","POST"})
      */
     public function rechercherStock(StockRepository $repos, Request $request): Response
     {
@@ -108,7 +105,7 @@ class StockController extends AbstractController
     }
 
     /**
-     * @Route("/verificationNom", name="verificationNom", methods={"GET","POST"})
+     * @Route("/api/verificationNom", name="verificationNom", methods={"GET","POST"})
      */
     public function verificationNom(StockRepository $repos,CentreRepository $centreR, Request $request): Response
     {

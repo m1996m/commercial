@@ -2,20 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
-
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class SecurityController extends AbstractController
 {
-
     /**
-     * @Route("api/login", name="app_login")
+     * @Route("/api/login", name="app_login")
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -27,24 +23,22 @@ class SecurityController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
-    
 
-        return $this->json(['last_username' => $lastUsername, 'error' => $error]);
+        return $this->json('security/login.html.twig',200);
     }
 
     /**
-     * @Route("api/user_connected1", name="user_connected1")
+     * @Route("/api/connexion", name="app_connexion")
      */
-    public function getUserConnected()
+    public function connexion()
     {
-        $defaultContext = [
-            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object, $format, $context) {
-                return 'symfony 4';
+        $defaultContent=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet, $format,$context){
+                return "Symfony 5";
             }
         ];
-
-        dump($user = $this->get('security.token_storage')->getToken()->getUser());
-        return $this->json(['user' => $this->getUser()], 200, [], $defaultContext);
+        $user=['id'=>$this->getUser()->getId(),'centre'=>$this->getUser()->getCentre()->getNom(),'slug'=>$this->getUser()->getSlug(),'role'=>$this->getUser()->getRoles(),'nom'=>$this->getUser()->getNom(),'prenom'=>$this->getUser()->getPrenom(),'tel'=>$this->getUser()->getTel(),'image'=>$this->getUser()->getImage()];
+        return $this->json($user,200,[],$defaultContent);
     }
 
     /**

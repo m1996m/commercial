@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class EmployeController extends AbstractController
 {
     /**
-     * @Route("/employe", name="employe_index", methods={"GET"})
+     * @Route("/api/employe", name="employe_index", methods={"GET"})
      */
     public function index(UserRepository $userRepository): Response
     {
@@ -23,11 +23,11 @@ class EmployeController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($userRepository->getAll(1),200,[],$defaultContext);
+        return $this->json($userRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/getAndEditEmploye/{slug}", name="getAndEditEmploye", methods={"GET","POST"})
+     * @Route("/api/getAndEditEmploye/{slug}", name="getAndEditEmploye", methods={"GET","POST"})
      */
     public function editEmploye(Request $request,User $user,UserPasswordEncoderInterface $encoder): Response
     {
@@ -49,7 +49,6 @@ class EmployeController extends AbstractController
             $user->setTel($form['tel']);
             $user->setImage($form['image']);
             $user->setFonction($form['fonction']);
-            $user->setRoles([$form['roles']]);
         }
         //$user->setCentre($centre);
         // if($user->getFirst()==0){
@@ -61,7 +60,7 @@ class EmployeController extends AbstractController
     }
 
         /**
-     * @Route("/uploadFile/{slug}", name="uploadFile", methods={"GET","POST"})
+     * @Route("/api/uploadFile/{slug}", name="uploadFile", methods={"GET","POST"})
      */
     public function uploadFile(Request $request,User $user,UserPasswordEncoderInterface $encoder): Response
     {
@@ -79,7 +78,7 @@ class EmployeController extends AbstractController
     }
 
     /**
-     * @Route("/getOneUser/{slug}", name="employe_show", methods={"GET"})
+     * @Route("/api/getOneUser/{slug}", name="employe_show", methods={"GET"})
      */
     public function show(UserRepository $userRepository,$slug): Response
     {
@@ -91,7 +90,7 @@ class EmployeController extends AbstractController
         return $this->json($userRepository->getOneUser($slug),200,[],$defaultContext);
     }
     /**
-     * @Route("/rechercherEmploye", name="rechercherEmploye", methods={"GET","POST"})
+     * @Route("/api/rechercherEmploye", name="rechercherEmploye", methods={"GET","POST"})
      */
     public function rechercherEmploye(UserRepository $repos,Request $request): Response
     {
@@ -102,11 +101,11 @@ class EmployeController extends AbstractController
         ];
         $request=$request->getContent();
         $content=json_decode($request,true);
-        return $this->json($repos->rechercherEmploye($content['content'],1),200,[],$defaultContext);
+        return $this->json($repos->rechercherEmploye($content['content'],$this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/verificationUniciteTel", name="verificationUniciteTel", methods={"GET","POST"})
+     * @Route("/api/verificationUniciteTel", name="verificationUniciteTel", methods={"GET","POST"})
      */
     public function verificationUniciteTel(UserRepository $repos,Request $request): Response
     {
@@ -121,7 +120,7 @@ class EmployeController extends AbstractController
     }
 
     /**
-     * @Route("/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
+     * @Route("/api/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
      */
     public function verificationUniciteEmail(UserRepository $repos,Request $request): Response
     {
@@ -136,7 +135,7 @@ class EmployeController extends AbstractController
     }
 
     /**
-     * @Route("/ValiditeModePasse/{slug}", name="ValiditeModePasse", methods={"GET","POST"})
+     * @Route("/api/ValiditeModePasse/{slug}", name="ValiditeModePasse", methods={"GET","POST"})
      */
     public function edit(Request $request, User $user, UserPasswordEncoderInterface $encoder): Response
     {
@@ -151,16 +150,16 @@ class EmployeController extends AbstractController
         //$nouveau=$form['nouveau'];
         $passwordValid=$encoder->isPasswordValid($user,$form['ancien']);
         //$nouveauValid=$encoder->isPasswordValid($user,$nouveau);
-        if($passwordValid){
+        if(!$passwordValid){
             $isValid=1;
         }
         return $this->json($isValid,200, [], $defaultContext);
     }
 
     /**
-     * @Route("/getDeleteEmploye/{slug}", name="employe_delete", methods={"POST"})
+     * @Route("/api/getDeleteEmploye/{slug}", name="employe_delete", methods={"POST"})
      */
-    public function delete(Request $request, User $user): Response
+    public function delete(User $user): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($user);

@@ -8,14 +8,10 @@ use App\Entity\FournisseurCentre;
 use App\Entity\Produit;
 use App\Entity\ProduitStock;
 use App\Entity\Stock;
-use App\Entity\TypeProduit;
 use App\Entity\User;
-use App\Form\ProduitStockType;
-use App\Form\ProduitType;
 use App\Repository\CentreRepository;
 use App\Repository\FournisseurCentreRepository;
 use App\Repository\ProduitStockRepository;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class ProduitStockController extends AbstractController
 {
     /**
-     * @Route("/produit/stock", name="produit_stock_index", methods={"GET"})
+     * @Route("/api/produit/stock", name="produit_stock_index", methods={"GET"})
      */
     public function index(ProduitStockRepository $produitStockRepository,CentreRepository $repos): Response
     {
@@ -34,12 +30,11 @@ class ProduitStockController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        $centre=$repos->find(1);
-        return $this->json($produitStockRepository->getAll(1),200,[],$defaultContext);
+        return $this->json($produitStockRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/produit/stock/new", name="produit_stock_new", methods={"GET","POST"})
+     * @Route("/api/produit/stock/new", name="produit_stock_new", methods={"GET","POST"})
      */
     public function new(Request $request,FournisseurCentreRepository $repos): Response
     {
@@ -63,7 +58,7 @@ class ProduitStockController extends AbstractController
             $produitStock->setCreateAt(new \DateTime());
             $produitStock->setProduit($produit);
             $produitStock->setStock($stock);
-            $produitStock->setUser($user);
+            $produitStock->setUser($this->getUser());
             $produitStock->setFournisseur($fournisseur);
             $entityManager->persist($produitStock);
             $entityManager->flush();
@@ -79,7 +74,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getOneProduitStock/{id}", name="produit_stock_show", methods={"GET","POST"})
+     * @Route("/api/getOneProduitStock/{id}", name="produit_stock_show", methods={"GET","POST"})
      */
     public function show(ProduitStockRepository $repos,$id): Response
     {
@@ -93,7 +88,7 @@ class ProduitStockController extends AbstractController
 
     /**
      * Permet de rechercher un produit un groupe de produit dans le stock produit
-     * @Route("/getProduit", name="getProduit", methods={"GET","POST"})
+     * @Route("/api/getProduit", name="getProduit", methods={"GET","POST"})
      */
     public function getProduit(Request $request,ProduitStockRepository $repos): Response
     {
@@ -108,7 +103,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getEtatStockProduit", name="etatStock", methods={"GET","POST"})
+     * @Route("/api/getEtatStockProduit", name="etatStock", methods={"GET","POST"})
      */
     public function getEtatStockProduit(Request $request,ProduitStockRepository $repos,CentreRepository $centrer): Response
     {
@@ -121,12 +116,11 @@ class ProduitStockController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        $centre=$centrer->find(1);
-        return $this->json($repos->getEtatStockProduit($stock,$centre),200,[],$defaultContext);
+        return $this->json($repos->getEtatStockProduit($stock,$this->getUser()->getCentre()),200,[],$defaultContext);
     }
 
     /**
-     * @Route("/verificationQuantites", name="verificationQuantites", methods={"GET","POST"})
+     * @Route("/api/verificationQuantites", name="verificationQuantites", methods={"GET","POST"})
      */
     public function verificationQuantite(Request $request,ProduitStockRepository $repos,CentreRepository $centrer): Response
     {
@@ -141,7 +135,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/stockdata", name="stockdata", methods={"GET","POST"})
+     * @Route("/api/stockdata", name="stockdata", methods={"GET","POST"})
      */
     public function stockdata(Request $request,ProduitStockRepository $repos,CentreRepository $centrer): Response
     {
@@ -156,7 +150,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getProduitsearchIntantane", name="getProduitsearchIntantane", methods={"GET","POST"})
+     * @Route("/api/getProduitsearchIntantane", name="getProduitsearchIntantane", methods={"GET","POST"})
      */
     public function getProduitsearchIntantane(Request $request,ProduitStockRepository $repos,CentreRepository $centrer): Response
     {
@@ -167,10 +161,10 @@ class ProduitStockController extends AbstractController
                 return "Symfony 5";
             },
         ];
-        return $this->json($repos->getProduitsearchIntantane($content['idProduitStock'],1),200,[],$defaultContext);
+        return $this->json($repos->getProduitsearchIntantane($content['idProduitStock'],$this->getUser()->getCentre()->getId()),200,[],$defaultContext);
     }
     /**
-     * @Route("/getAndEditProduitStock/{id}", name="produit_stock_edit", methods={"GET","POST"})
+     * @Route("/api/getAndEditProduitStock/{id}", name="produit_stock_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, ProduitStock $produitStock): Response
     {
@@ -182,13 +176,13 @@ class ProduitStockController extends AbstractController
         $request=$request->getContent();
         $form=json_decode($request,true);
         $entityManager = $this->getDoctrine()->getManager();
-        $produit=$entityManager->getRepository(Produit::class)->find($form['idP']);
+        $produit=$entityManager->getRepository(Produit::class)->find($form['idProduit']);
         //$user=$entityManager->getRepository(User::class)->find($form['idUser']);
         $fournisseur=$entityManager->getRepository(Fournisseur::class)->find($form['idf']);
         $stock=$entityManager->getRepository(Stock::class)->find($form['ids']);
         $produitStock->setPUV($form['PUV']);
         $produitStock->setPUA($form['PUA']);
-        $produitStock->setQuantite($form['quantite']);
+        $produitStock->setQuantite($form['quantity']);
         $produitStock->setProduit($produit);
         $produitStock->setStock($stock);
         //$produitStock->setUser($user);
@@ -197,13 +191,13 @@ class ProduitStockController extends AbstractController
         //Ajout du fournisseur centre
         $clientCentre=new FournisseurCentre();
         $clientCentre->setFournisseur($fournisseur);
-        $clientCentre->setCentre($produitStock->getStock()->getCentre());
+        $clientCentre->setCentre($this->getUser()->getCentre());
         $this->getDoctrine()->getManager()->flush();
         return $this->json("Modification reussie",200, [], $defaultContext);
     }
 
     /**
-     * @Route("/remplacerProduit", name="remplacerProduit", methods={"GET","POST"})
+     * @Route("/api/remplacerProduit", name="remplacerProduit", methods={"GET","POST"})
      */
     public function remplacerProduit(Request $request, ProduitStockRepository $produitStockRepository): Response
     {
@@ -233,7 +227,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/getDelete/produitStock/{id}", name="produit_stock_delete", methods={"POST"})
+     * @Route("/api/getDelete/produitStock/{id}", name="produit_stock_delete", methods={"POST"})
      */
     public function delete(ProduitStock $produitStock): Response
     {
@@ -244,7 +238,7 @@ class ProduitStockController extends AbstractController
     }
 
     /**
-     * @Route("/tQuantite", name="tQuantite", methods={"GET","POST"})
+     * @Route("/api/tQuantite", name="tQuantite", methods={"GET","POST"})
      */
     public function totalQuantite(Request $request,ProduitStockRepository $repos): Response
     {
