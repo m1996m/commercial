@@ -214,7 +214,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('stock.centre','centre')
             ->select("SUM(rayon.quantite) as quantiteVendu,SUM(vente.remise) as remise,produit.designation as designation,type.type as typeProduit, ps.PUA as PUA,ps.PUV as PUV")
             ->where('centre.id=:idCentre')
-            ->andwhere('vente.createdAt BETWEEN :date1 AND :date2')
+            ->andwhere("DATE_FORMAT(vente.createdAt,'Y-m-d') BETWEEN :date1 AND :date2")
             ->setParameters(['idCentre'=>$idCentre,'date1'=>$date1,'date2'=>$date2])
             ->groupBy('produit.designation,type.type,ps.PUA,ps.PUV')
             ->getQuery()
