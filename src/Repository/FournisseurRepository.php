@@ -11,7 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Fournisseur|null findOneBy(array $criteria, array $orderBy = null)
  * @method Fournisseur[]    findAll()
  * @method Fournisseur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Fournisseur|null rechercherFournisseur($valeur)
  */
 class FournisseurRepository extends ServiceEntityRepository
 {

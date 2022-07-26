@@ -44,9 +44,32 @@ class Produit
      */
     private $produitStocks;
 
+    /**
+     * @ORM\Column(type="string", length=255,nullable=true)
+     */
+    private $domaine;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ProduitCommande::class, mappedBy="produit")
+     */
+    private $produitCommandes;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deleteAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $imagePrincipal;
+
+
     public function __construct()
     {
         $this->produitStocks = new ArrayCollection();
+        $this->produitCommandes = new ArrayCollection();
+        $this->imageProduits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,4 +154,71 @@ class Produit
 
         return $this;
     }
+
+    public function getDomaine(): ?string
+    {
+        return $this->domaine;
+    }
+
+    public function setDomaine(string $domaine): self
+    {
+        $this->domaine = $domaine;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProduitCommande[]
+     */
+    public function getProduitCommandes(): Collection
+    {
+        return $this->produitCommandes;
+    }
+
+    public function addProduitCommande(ProduitCommande $produitCommande): self
+    {
+        if (!$this->produitCommandes->contains($produitCommande)) {
+            $this->produitCommandes[] = $produitCommande;
+            $produitCommande->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitCommande(ProduitCommande $produitCommande): self
+    {
+        if ($this->produitCommandes->removeElement($produitCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($produitCommande->getProduit() === $this) {
+                $produitCommande->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDeleteAt(): ?\DateTimeInterface
+    {
+        return $this->deleteAt;
+    }
+
+    public function setDeleteAt(?\DateTimeInterface $deleteAt): self
+    {
+        $this->deleteAt = $deleteAt;
+
+        return $this;
+    }
+
+    public function getImagePrincipal(): ?string
+    {
+        return $this->imagePrincipal;
+    }
+
+    public function setImagePrincipal(?string $imagePrincipal): self
+    {
+        $this->imagePrincipal = $imagePrincipal;
+
+        return $this;
+    }
+
 }

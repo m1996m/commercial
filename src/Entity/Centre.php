@@ -86,6 +86,21 @@ class Centre
      */
     private $typeRayons;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $domaine;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cp;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deleteAt;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -362,6 +377,42 @@ class Centre
                 $typeRayon->setCentre(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDomaine(): ?string
+    {
+        return $this->domaine;
+    }
+
+    public function setDomaine(?string $domaine): self
+    {
+        $this->domaine = $domaine;
+
+        return $this;
+    }
+
+    public function getCp(): ?string
+    {
+        return $this->cp;
+    }
+
+    public function setCp(?string $cp): self
+    {
+        $this->cp = $cp;
+
+        return $this;
+    }
+
+    public function getDeleteAt(): ?\DateTimeInterface
+    {
+        return $this->deleteAt;
+    }
+
+    public function setDeleteAt(?\DateTimeInterface $deleteAt): self
+    {
+        $this->deleteAt = $deleteAt;
 
         return $this;
     }

@@ -16,11 +16,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
+/**
+ * @IsGranted("ROLE_USER")
+ */
+
+/**
+ * @IsGranted("ROLE_USER")
+ */
 class ProduitvenduController extends AbstractController
 {
     /**
-     * @Route("/api/vente", name="vente_index", methods={"GET"})
+     * @Route("/api/venteAll", name="vente_index", methods={"GET"})
      */
     public function index(ProduitvenduRepository $venteRepository): Response
     {
@@ -29,7 +37,22 @@ class ProduitvenduController extends AbstractController
                 return "Symfony 5";
             }
         ];
-        return $this->json($venteRepository->getAll($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
+        return $this->json($venteRepository->getAllVente($this->getUser()->getCentre()->getId()),200,[],$defaultContext);
+    }
+
+    /**
+     * @Route("/api/vente/{id}", name="vente", methods={"GET","POST"})
+     */
+    public function vente(ProduitvenduRepository $venteRepository,Request $request,$id): Response
+    {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        $request=$request->getContent();
+        $form=json_decode($request,true);
+        return $this->json($venteRepository->getOneVenteFacture($id),200,[],$defaultContext);
     }
 
     /**

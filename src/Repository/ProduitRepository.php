@@ -13,8 +13,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Produit|null findOneBy(array $criteria, array $orderBy = null)
  * @method Produit[]    findAll()
  * @method Produit[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Produit|null rechercherProduit($value)
- * @method Produit|null rechercherProduitTypeDesignation($value,$type)
  */
 class ProduitRepository extends ServiceEntityRepository
 {
@@ -128,6 +126,17 @@ class ProduitRepository extends ServiceEntityRepository
             $query = $qb->getQuery();
             return $query->execute();
     }
+    public function getproduitDomaine($domaine)
+    {
+        $qb= $this->createQueryBuilder('p')
+            ->join('p.type','type')
+            ->select('p.designation,p.PUA,p.PUV,p.id,type.type as designationTypeProduit,p.imagePrincipal as image')
+            ->Where('p.domaine = :domaine')
+            ->setParameter('domaine', $domaine)
+            ->orderBy('p.designation', 'ASC');
+        $query = $qb->getQuery();
+        return $query->execute();
+    }
     public function getOneProduit($id,Centre $centre)
     {
         return $this->createQueryBuilder('p')
@@ -139,6 +148,22 @@ class ProduitRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+    //cette fontion permet de renvoyer l'identifiant d'un produit
+    public function idProduit($designation,$nomTypeProduit,$nomCentre)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.type','type')
+            ->join('type.centre','centre')
+            ->select('p.id')
+            ->andWhere('p.designation = :designation')
+            ->andWhere('type.type = :type')
+            ->andWhere('centre.nom = :nomCentre')
+            ->setParameters(['designation'=> $designation,'type'=>$nomTypeProduit,'nomCentre'=>$nomCentre])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
     }
     
 }

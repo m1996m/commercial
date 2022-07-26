@@ -15,9 +15,6 @@ use PDO;
  * @method Rayon|null findOneBy(array $criteria, array $orderBy = null)
  * @method Rayon[]    findAll()
  * @method Rayon[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Rayon|null rechercherProduit($produitStock)
- * @method Rayon|null rechercherProduitRayon($rayon,$centre)
- * @method Rayon|null etatRayon($centre)
  */
 class RayonRepository extends ServiceEntityRepository
 {

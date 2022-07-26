@@ -11,12 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 class ProduitController extends AbstractController
 {
     /**
      * @Route("/api/produit", name="produit_index", methods={"GET"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function index(ProduitRepository $produitRepository,CentreRepository $repos): Response
     {
@@ -58,6 +61,18 @@ class ProduitController extends AbstractController
             },
         ];
         return $this->json($repos->getOneProduit($id,$this->getUser()->getCentre()),200,[],$defaultContext);
+    }
+    /**
+     * @Route("/getProduitDomaine/{domaine}", name="produitdomaine", methods={"GET"})
+     */
+    public function produitdomaine(ProduitRepository $repos,$domaine): Response
+    {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$contex){
+                return "Symfony 5";
+            },
+        ];
+        return $this->json($repos->getproduitDomaine($domaine),200,[],$defaultContext);
     }
 
     /**

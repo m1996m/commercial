@@ -29,21 +29,34 @@ class RegistrationController extends AbstractController
     public function register(CentreRepository $reposo,Request $request,UserRepository $repos,UserPasswordEncoderInterface $enccoder, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         $user = new User();
+        $motdepasse="";
         $request=$request->getContent();
         $form=json_decode($request,true);
         $user->setEmail($form['email']);
-        $user->setActif('non');
-        $user->setNom($form['nom']);
-        $user->setPrenom($form['prenom']);
-        $user->setTel($form['tel']);
+        $user->setActif('actif');
         $user->setFirst(0);
-        //$user->setSlug($enccoder->encodePassword($user,$user->getSlug()));
-        $user->setPassword($enccoder->encodePassword($user,$form['password']));
-        if($repos->findAll()){
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $mp=substr(str_shuffle($chars),0,8);
+        if($form['type']=="employe"){
+            $user->setRoles(['ROLE_USER_EMPLOYE']);
+            $motdepasse=$mp;
+            $user->setNom($form['nom']);
+            $user->setPrenom($form['prenom']);
+            $user->setTel($form['tel']);
+            $user->setCentre($this->getUser()->getCentre());
+        }elseif ($form['type']=="user"){
+            $motdepasse=$form['password'];
+            $user->setNom($form['nom']);
+            $user->setPrenom($form['prenom']);
+            $user->setTel($form['tel']);
             $user->setRoles(['ROLE_USER']);
         }else{
-            $user->setRoles(['ROLE_ADMIN']);
+            $motdepasse="password";
+            $user->setCentre($reposo->find($repos->getUser($form['email'])) );
+            $user->setRoles(['ROLE_ADMIN_CENTRE']);
+
         }
+        $user->setPassword($enccoder->encodePassword($user,$motdepasse));
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();

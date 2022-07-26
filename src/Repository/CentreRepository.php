@@ -11,7 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Centre|null findOneBy(array $criteria, array $orderBy = null)
  * @method Centre[]    findAll()
  * @method Centre[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Centre|null RechercherCentre(string $centre)
   */
 class CentreRepository extends ServiceEntityRepository
 {
@@ -70,13 +69,25 @@ class CentreRepository extends ServiceEntityRepository
     public function getOneCentre($idCentre)
     {
         return $this->createQueryBuilder('c')
-            ->Where('c.id LIKE :id')
+            ->Where('c.id = :id')
             ->select('c.nom,c.tel,c.email,c.id,c.adresse,c.pays,c.ville')
             ->setParameters(['id'=>$idCentre])
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+
+    public function getdomaine($domaine)
+    {
+        return $this->createQueryBuilder('c')
+            ->Where('c.domaine =:domaine')
+            ->select('c.nom,c.tel,c.email,c.id,c.adresse,c.pays,c.ville,c.domaine')
+            ->setParameters(['domaine'=>$domaine])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
     }
 
     public function getAll()

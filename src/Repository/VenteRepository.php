@@ -11,8 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Vente|null findOneBy(array $criteria, array $orderBy = null)
  * @method Vente[]    findAll()
  * @method Vente[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Vente|null rechercherDernierObjet($id)
- * @method Vente|null getproduitVendu($vente,$rayon)
  * @method Vente|null getOne($value)
  */
 class VenteRepository extends ServiceEntityRepository
@@ -72,6 +70,17 @@ class VenteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+    public function getAllVente($idCentre)
+    {
+        return $this->createQueryBuilder('v')
+            ->join('v.client','client')
+            ->select("client.id,v.remise,v.id,v.createdAt,")
+            ->where("v.id=:id")
+            ->setParameter('id',$idCentre)
+            ->getQuery()
+            ->getResult()
+            ;
     }
 
     public function getproduitVendu()

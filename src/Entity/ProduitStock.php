@@ -69,6 +69,16 @@ class ProduitStock
      */
     private $prise;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $reference;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $qrcode;
+
     public function __construct()
     {
         $this->rayons = new ArrayCollection();
@@ -213,6 +223,30 @@ class ProduitStock
     public function setPrise(?int $prise): self
     {
         $this->prise = $prise;
+
+        return $this;
+    }
+
+    public function getReference(): ?string
+    {
+        return $this->reference;
+    }
+
+    public function setReference(string $reference): self
+    {
+        $this->reference = $reference;
+
+        return $this;
+    }
+
+    public function getQrcode(): ?string
+    {
+        return $this->qrcode;
+    }
+
+    public function setQrcode(?string $qrcode): self
+    {
+        $this->qrcode = $qrcode;
 
         return $this;
     }

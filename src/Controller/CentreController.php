@@ -15,6 +15,7 @@ class CentreController extends AbstractController
 {
     /**
      * @Route("/api/centre", name="centre_index", methods={"GET"})
+     * @IsGranted("ROLE_USER")
      */
     public function index(CentreRepository $centreRepository): Response
     {
@@ -30,6 +31,7 @@ class CentreController extends AbstractController
 
     /**
      * @Route("/centre/new", name="centre_new", methods={"GET","POST"})
+     *
      */
     public function new(Request $request): Response
     {
@@ -50,6 +52,8 @@ class CentreController extends AbstractController
 
     /**
      * @Route("/api/getOneCentre/{id}", name="centre_show", methods={"GET"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function show(CentreRepository $centreRepository,$id): Response
     {
@@ -60,10 +64,26 @@ class CentreController extends AbstractController
         ];
         return $this->json($centreRepository->getOneCentre($id),200,[],$defaultContext);
     }
+
+
+    /**
+     * @Route("/domaine/{domaine}", name="domaine", methods={"GET"})
+     */
+    public function domaine(CentreRepository $centreRepository,$domaine): Response
+    {
+        $defaultContext=[
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=>function($objet,$format,$context){
+                return "Symfony 5";
+            }
+        ];
+        return $this->json($centreRepository->getdomaine($domaine),200,[],$defaultContext);
+    }
     
 
     /**
      * @Route("/api/rechercherCentre", name="rechercherCentre", methods={"GET","POST"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function rechercherCentre(CentreRepository $repos, Request $request): Response
     {
@@ -78,6 +98,8 @@ class CentreController extends AbstractController
     }
     /**
      * @Route("/api/getAndOrEditCentre/{id}", name="centre_edit", methods={"GET","POST"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function edit(Request $request, Centre $centre): Response
     {
@@ -100,6 +122,8 @@ class CentreController extends AbstractController
 
     /**
      * @Route("/api/getDeleteCentre/{id}", name="centre_delete", methods={"POST"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function delete(Request $request, Centre $centre): Response
     {
@@ -111,6 +135,8 @@ class CentreController extends AbstractController
 
     /**
      * @Route("/api/verificationUniciteTelCentre", name="verificationUniciteTelCentre", methods={"GET","POST"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function verificationUniciteTel(CentreRepository $repos,Request $request): Response
     {
@@ -121,6 +147,8 @@ class CentreController extends AbstractController
 
     /**
      * @Route("/api/verificationUniciteEmail", name="verificationUniciteEmail", methods={"GET","POST"})
+     *
+     * @IsGranted("ROLE_USER")
      */
     public function verificationUniciteEmail(CentreRepository $repos,Request $request): Response
     {

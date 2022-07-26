@@ -16,11 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Produitvendu|null findOneBy(array $criteria, array $orderBy = null)
  * @method Produitvendu[]    findAll()
  * @method Produitvendu[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Produitvendu|null rechercherDernierObjet()
- * @method Produitvendu|null getAll()
- * @method Produitvendu|null getproduitVendu($vente,$rayon)
  * @method Produitvendu|null getOne($value)
- * @method Produitvendu|null mesVente($value)
  * @method Produitvendu|null mesAchat($value)
  * @method Produitvendu|null venteJour($value)
  * @method Produitvendu|null ventMois($value)
@@ -111,6 +107,26 @@ class ProduitvenduRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getAllVente($idCentre)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.vente','v')
+            ->join('v.user','u')
+            ->join('v.client','client')
+            ->join('p.rayon','rayon')
+            ->join('rayon.type','type')
+            ->join('rayon.produitStock','ps')
+            ->join('ps.produit','produit')
+            ->join('produit.type','tp')
+            ->join('type.centre','c')
+            ->select("v.id AS id,client.nom as nomClient,client.prenom as prenomClient,u.nom as nomUser,u.prenom as prenomUser,v.createdAt")
+            ->where("c.id=:id")
+            ->setParameter('id',$idCentre)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     public function getAll($idCentre)
     {
         return $this->createQueryBuilder('p')
@@ -133,6 +149,29 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+    //Fonction permettant de recuperer tous les produits d'une ventes
+    public function getOneVenteFacture($idVente)
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.vente','vente')
+            ->join('vente.client','client')
+            ->join('vente.user','user')
+            ->join('p.rayon','rayon')
+            ->join('rayon.type','nomRayon')
+            ->join('rayon.type','type')
+            ->join('type.centre','centre')
+            ->join('rayon.produitStock','ps')
+            ->join('ps.produit','produit')
+            ->join('produit.type','tp')
+            ->join('ps.stock','stock')
+            ->select("user.nom as nomVendeur, user.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,centre.email as emailCentre,centre.tel as telCentre,centre.adresse as adresseCentre,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVente,vente.id as idVente,client.adresse as adresseClient,client.tel as telClient")
+            ->where('vente.id=:vente')
+            ->setParameter('vente',$idVente)
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
     public function getOneVente($idProduitVendu,$idCentre)
     {
@@ -147,7 +186,7 @@ class ProduitvenduRepository extends ServiceEntityRepository
             ->join('ps.stock','stock')
             ->join('stock.centre','centre')
             ->join('produit.type','tp')
-            ->select("useur.nom as nomVendeur, useur.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVentre,vente.id as idVente")            ->where('p.id=:id')
+            ->select("useur.nom as nomVendeur, useur.prenom as prenomVendeur,p.id,rayon.id as idRayon, client.nom as nomClient,client.id idClient,client.prenom as prenomClient,produit.designation as designationProduit, produit.id as idProduit,tp.id as idTypeProduit,tp.type as designationProduitType,vente.remise,p.quantite as quantiteVendu,ps.PUV as prixVente,nomRayon.designation as designitionTypeRayon,centre.nom as nomCentre,vente.createdAt as dateVente,vente.id as idVente")            ->where('p.id=:id')
             ->andwhere('centre.id=:idCentre')
             ->setParameters(['id'=>$idProduitVendu,'idCentre'=>$idCentre])
             ->getQuery()
